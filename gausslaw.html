@@ -1,0 +1,800 @@
+:Coulomb's Law Master Simulator:coulombs_law_simulator.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coulomb's Law Master Simulator</title>
+    <!-- Tailwind CSS for elegant layout styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js for beautiful live scientific plotting -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome for professional UI Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- MathJax for rendering gorgeous math LaTeX -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            950: '#0b0f19',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar to match dark aesthetic */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-slate-950">
+
+    <!-- Navbar Header -->
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 bg-emerald-500/10 text-emerald-400 rounded-xl border border-emerald-500/20">
+                    <i class="fa-solid fa-atom text-2xl animate-spin-slow"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                        Coulomb's Law <span class="text-xs bg-emerald-500/20 text-emerald-400 font-semibold px-2 py-0.5 rounded-full border border-emerald-500/30">Sandbox v2.0</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Interactive electrostatic force & distance relationship model</p>
+                </div>
+            </div>
+            
+            <!-- Quick Physics Presets -->
+            <div class="flex items-center gap-2 bg-slate-950 p-1.5 rounded-xl border border-slate-800">
+                <span class="text-xs text-slate-400 font-medium px-2"><i class="fa-solid fa-sliders mr-1 text-emerald-400"></i> Presets:</span>
+                <button onclick="loadPreset('attract')" class="text-xs bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white px-3 py-1.5 rounded-lg border border-slate-800 transition-all font-medium">Strong Attraction</button>
+                <button onclick="loadPreset('repel')" class="text-xs bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white px-3 py-1.5 rounded-lg border border-slate-800 transition-all font-medium">Strong Repulsion</button>
+                <button onclick="loadPreset('neutral')" class="text-xs bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white px-3 py-1.5 rounded-lg border border-slate-800 transition-all font-medium">Neutral</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace Layout -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left Column: Interactive Simulation Screen & Real-time Graph (7 Cols) -->
+        <div class="lg:col-span-7 flex flex-col gap-6">
+            
+            <!-- Canvas Simulation Card -->
+            <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-2xl flex flex-col">
+                <div class="bg-slate-900/50 border-b border-slate-800 px-5 py-3.5 flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <h2 class="text-sm font-semibold tracking-wide text-slate-200 uppercase">Live Canvas Viewport</h2>
+                    </div>
+                    <span class="text-xs text-slate-400 flex items-center gap-1">
+                        <i class="fa-solid fa-hand-pointer text-emerald-400"></i> Click & drag charges to move them
+                    </span>
+                </div>
+                
+                <!-- HTML5 Interactivity Canvas -->
+                <div class="relative bg-slate-950 flex-grow" style="height: 280px;">
+                    <canvas id="simCanvas" class="w-full h-full cursor-grab active:cursor-grabbing"></canvas>
+                </div>
+            </div>
+
+            <!-- Graph Card -->
+            <div class="bg-slate-900 rounded-2xl border border-slate-800 p-5 shadow-2xl flex flex-col">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-sm font-semibold text-slate-200 uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-chart-line text-emerald-400"></i> Force vs. Distance Curve ($F \propto \frac{1}{r^2}$)
+                    </h3>
+                    <span class="text-xs text-slate-400">Real-time coordinates mapped</span>
+                </div>
+                <div class="relative bg-slate-950 p-2 rounded-xl border border-slate-800/80" style="height: 240px;">
+                    <canvas id="chartCanvas"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Column: Controls, Equations, & Parameters Panel (5 Cols) -->
+        <div class="lg:col-span-5 flex flex-col gap-6">
+            
+            <!-- System Readout Card -->
+            <div class="bg-slate-900 rounded-2xl border border-slate-800 p-6 shadow-2xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
+                
+                <h3 class="text-xs font-semibold tracking-wider text-slate-400 uppercase mb-4">Calculated Electrostatic Output</h3>
+                
+                <!-- Main Large Metric -->
+                <div class="flex flex-col mb-4">
+                    <span class="text-xs text-slate-500 font-semibold">Electrostatic Force ($F$)</span>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-4xl md:text-5xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300 font-mono" id="force-display">
+                            0.0000 N
+                        </span>
+                    </div>
+                    <div id="vector-nature-badge" class="mt-2 text-xs font-semibold px-2.5 py-1 rounded-lg border w-fit flex items-center gap-1.5">
+                        <!-- Filled in dynamically -->
+                    </div>
+                </div>
+
+                <!-- Parameters Summary Pill -->
+                <div class="grid grid-cols-3 gap-3 border-t border-slate-800 pt-4 mt-2">
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/60 text-center">
+                        <span class="block text-[10px] text-slate-500 uppercase font-bold">Charge $q_1$</span>
+                        <span class="text-sm font-bold font-mono text-slate-200" id="badge-q1">+5.0 µC</span>
+                    </div>
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/60 text-center">
+                        <span class="block text-[10px] text-slate-500 uppercase font-bold">Charge $q_2$</span>
+                        <span class="text-sm font-bold font-mono text-slate-200" id="badge-q2">-5.0 µC</span>
+                    </div>
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/60 text-center">
+                        <span class="block text-[10px] text-slate-500 uppercase font-bold">Distance $r$</span>
+                        <span class="text-sm font-bold font-mono text-slate-200" id="badge-r">0.50 m</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide Controllers -->
+            <div class="bg-slate-900 rounded-2xl border border-slate-800 p-6 shadow-2xl flex flex-col gap-5">
+                <h3 class="text-xs font-semibold tracking-wider text-slate-400 uppercase">Variable Adjustments</h3>
+                
+                <!-- Slider Charge 1 -->
+                <div class="flex flex-col gap-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-medium text-slate-300 flex items-center gap-1.5">
+                            <span class="w-2.5 h-2.5 rounded-full bg-red-500 inline-block"></span>
+                            Charge 1 ($q_1$)
+                        </span>
+                        <span class="text-sm font-mono font-bold text-red-400" id="text-q1">+5 µC</span>
+                    </div>
+                    <input type="range" id="slider-q1" min="-10" max="10" step="1" value="5"
+                           class="w-full accent-emerald-400 h-2 bg-slate-950 rounded-lg cursor-pointer border border-slate-800">
+                    <div class="flex justify-between text-[10px] text-slate-500">
+                        <span>-10 µC (Negative)</span>
+                        <span>0 µC (Neutral)</span>
+                        <span>+10 µC (Positive)</span>
+                    </div>
+                </div>
+
+                <!-- Slider Charge 2 -->
+                <div class="flex flex-col gap-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-medium text-slate-300 flex items-center gap-1.5">
+                            <span class="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span>
+                            Charge 2 ($q_2$)
+                        </span>
+                        <span class="text-sm font-mono font-bold text-blue-400" id="text-q2">-5 µC</span>
+                    </div>
+                    <input type="range" id="slider-q2" min="-10" max="10" step="1" value="-5"
+                           class="w-full accent-emerald-400 h-2 bg-slate-950 rounded-lg cursor-pointer border border-slate-800">
+                    <div class="flex justify-between text-[10px] text-slate-500">
+                        <span>-10 µC (Negative)</span>
+                        <span>0 µC (Neutral)</span>
+                        <span>+10 µC (Positive)</span>
+                    </div>
+                </div>
+
+                <!-- Slider Distance -->
+                <div class="flex flex-col gap-2 border-t border-slate-800 pt-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-medium text-slate-300 flex items-center gap-1.5">
+                            <i class="fa-solid fa-arrows-left-right text-emerald-400"></i>
+                            Separation Distance ($r$)
+                        </span>
+                        <span class="text-sm font-mono font-bold text-emerald-400" id="text-r">0.50 m</span>
+                    </div>
+                    <input type="range" id="slider-r" min="0.15" max="2.00" step="0.05" value="0.50"
+                           class="w-full accent-emerald-400 h-2 bg-slate-950 rounded-lg cursor-pointer border border-slate-800">
+                    <div class="flex justify-between text-[10px] text-slate-500">
+                        <span>0.15 meters (Very Close)</span>
+                        <span>2.00 meters (Far Away)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step-by-Step Live Math Equation Card -->
+            <div class="bg-slate-900 rounded-2xl border border-slate-800 p-6 shadow-2xl flex flex-col gap-4">
+                <h3 class="text-xs font-semibold tracking-wider text-slate-400 uppercase flex items-center gap-2">
+                    <i class="fa-solid fa-calculator text-emerald-400"></i> Math Step-by-Step
+                </h3>
+
+                <!-- General Formula -->
+                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-center text-sm">
+                    <div class="text-center">
+                        <span class="block text-[10px] text-slate-500 mb-1">Standard Equation Form</span>
+                        <span class="text-slate-300 font-semibold">$$F = k_e \cdot \frac{|q_1 \cdot q_2|}{r^2}$$</span>
+                    </div>
+                </div>
+
+                <!-- Live Substitution View -->
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col gap-3">
+                    <span class="text-[10px] text-slate-500 uppercase font-bold">Substitution of Active Values</span>
+                    
+                    <div class="text-slate-300 text-xs font-mono space-y-2">
+                        <div class="flex justify-between">
+                            <span>$k_e$ (Coulomb Constant)</span>
+                            <span class="text-emerald-400 font-bold">8.988 &times; 10⁹ N·m²/C²</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>$|q_1 \cdot q_2|$</span>
+                            <span id="math-charges" class="text-indigo-400">|5 &times; 10⁻⁶ &times; -5 &times; 10⁻⁶| C²</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>$r^2$</span>
+                            <span id="math-distance" class="text-amber-400">(0.50)² = 0.25 m²</span>
+                        </div>
+                    </div>
+                    
+                    <div class="border-t border-slate-800 pt-3 flex flex-col items-center">
+                        <span class="text-[9px] text-slate-500 uppercase font-bold">Calculation Result</span>
+                        <div id="math-final-formula" class="text-sm font-semibold text-slate-200 mt-1 font-mono text-center">
+                            F = 8.988 &times; 10⁹ &times; (2.5 &times; 10⁻¹¹) / 0.25
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer Summary Section -->
+    <footer class="border-t border-slate-800 bg-slate-900/60 py-6 px-6 mt-12 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <p>© 2026 Coulomb's Law Laboratory. Premium Academic Resource.</p>
+            <div class="flex gap-4">
+                <a href="https://en.wikipedia.org/wiki/Coulomb%27s_law" target="_blank" class="hover:text-slate-300 transition-colors">Physics documentation</a>
+                <span>•</span>
+                <span class="text-slate-400"><i class="fa-solid fa-code text-emerald-400"></i> Pure Interactive Vector Mechanics</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Physical Constants
+        const ke = 8.9875517923e9; // N m^2 / C^2
+
+        // Simulation State
+        let q1 = 5;       // in microcoulombs
+        let q2 = -5;      // in microcoulombs
+        let r = 0.50;     // in meters
+
+        // Canvas Setup
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Physics Interaction coordinates
+        let isDragging = false;
+        let dragTarget = null; // 'q1' or 'q2'
+        let q1Pos = { x: 0, y: 0, radius: 24 };
+        let q2Pos = { x: 0, y: 0, radius: 24 };
+
+        // DOM elements cache
+        const sliderQ1 = document.getElementById('slider-q1');
+        const sliderQ2 = document.getElementById('slider-q2');
+        const sliderR = document.getElementById('slider-r');
+
+        const textQ1 = document.getElementById('text-q1');
+        const textQ2 = document.getElementById('text-q2');
+        const textR = document.getElementById('text-r');
+
+        const badgeQ1 = document.getElementById('badge-q1');
+        const badgeQ2 = document.getElementById('badge-q2');
+        const badgeR = document.getElementById('badge-r');
+
+        const forceDisplay = document.getElementById('force-display');
+        const vectorBadge = document.getElementById('vector-nature-badge');
+
+        const mathCharges = document.getElementById('math-charges');
+        const mathDistance = document.getElementById('math-distance');
+        const mathFinalFormula = document.getElementById('math-final-formula');
+
+        // Chart.js Setup
+        const chartCanvas = document.getElementById('chartCanvas');
+        let forceChart = null;
+
+        // Initialize Canvas Sizing beautifully (supports high-res Retina)
+        function resizeCanvas() {
+            const rect = canvas.parentNode.getBoundingClientRect();
+            canvas.width = rect.width * window.devicePixelRatio;
+            canvas.height = 280 * window.devicePixelRatio;
+            canvas.style.width = '100%';
+            canvas.style.height = '280px';
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+            drawSimulation();
+        }
+
+        // Calculation Routine
+        function calculateForce(valQ1, valQ2, valR) {
+            if (valR <= 0) return 0;
+            const q1_c = valQ1 * 1e-6;
+            const q2_c = valQ2 * 1e-6;
+            return ke * (Math.abs(q1_c * q2_c) / (valR * valR));
+        }
+
+        // Set Presets dynamically
+        function loadPreset(presetType) {
+            if (presetType === 'attract') {
+                q1 = 8;
+                q2 = -8;
+                r = 0.40;
+            } else if (presetType === 'repel') {
+                q1 = 8;
+                q2 = 8;
+                r = 0.50;
+            } else if (presetType === 'neutral') {
+                q1 = 0;
+                q2 = 5;
+                r = 0.60;
+            }
+            updateSlidersFromVariables();
+            syncValues();
+        }
+
+        function updateSlidersFromVariables() {
+            sliderQ1.value = q1;
+            sliderQ2.value = q2;
+            sliderR.value = r;
+        }
+
+        // Draw individual vectors with glow and dynamic colors
+        function drawVector(xStart, yStart, dx, dy, forceVal, isRepulsion) {
+            if (forceVal === 0) return;
+
+            // Logarithmic Arrow length constraint
+            const magnitude = 25 + Math.log10(forceVal + 1) * 65;
+            const angle = Math.atan2(dy, dx);
+            
+            const xEnd = xStart + magnitude * Math.cos(angle);
+            const yEnd = yStart + magnitude * Math.sin(angle);
+
+            // Vector Shadow Glow
+            ctx.save();
+            ctx.shadowColor = '#eab308';
+            ctx.shadowBlur = 10;
+            ctx.strokeStyle = '#eab308';
+            ctx.fillStyle = '#eab308';
+            ctx.lineWidth = 4;
+            ctx.lineCap = 'round';
+
+            // Shaft
+            ctx.beginPath();
+            ctx.moveTo(xStart, yStart);
+            ctx.lineTo(xEnd, yEnd);
+            ctx.stroke();
+
+            // Arrow Head
+            const headLength = 12;
+            ctx.beginPath();
+            ctx.moveTo(xEnd, yEnd);
+            ctx.lineTo(xEnd - headLength * Math.cos(angle - Math.PI / 6), yEnd - headLength * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(xEnd - headLength * Math.cos(angle + Math.PI / 6), yEnd - headLength * Math.sin(angle + Math.PI / 6));
+            ctx.closePath();
+            ctx.fill();
+
+            // Label Force Vector value
+            ctx.restore();
+            ctx.fillStyle = '#fef08a';
+            ctx.font = '500 11px monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText(`F = ${forceVal.toFixed(3)} N`, (xStart + xEnd) / 2, yStart - 14);
+        }
+
+        // Primary Canvas Rendering Frame
+        function drawSimulation() {
+            const width = canvas.width / window.devicePixelRatio;
+            const height = canvas.height / window.devicePixelRatio;
+
+            ctx.clearRect(0, 0, width, height);
+
+            // Grid background accent
+            ctx.strokeStyle = 'rgba(51, 65, 85, 0.15)';
+            ctx.lineWidth = 1;
+            const gridSize = 20;
+            for (let x = 0; x < width; x += gridSize) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
+            }
+            for (let y = 0; y < height; y += gridSize) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
+            }
+
+            // Map physical distance meters to pixels symmetrically in the center of the frame
+            const centerX = width / 2;
+            const centerY = height / 2 + 10;
+
+            // 1 meter = 240 pixels (scale ratio)
+            const pixelDistance = r * 240;
+
+            q1Pos.x = centerX - (pixelDistance / 2);
+            q1Pos.y = centerY;
+            q2Pos.x = centerX + (pixelDistance / 2);
+            q2Pos.y = centerY;
+
+            // Draw field lines/influence glow
+            drawInfluenceField(q1Pos.x, q1Pos.y, q1);
+            drawInfluenceField(q2Pos.x, q2Pos.y, q2);
+
+            // Distance dimension line below particles
+            ctx.save();
+            ctx.strokeStyle = '#475569';
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(q1Pos.x, q1Pos.y + 40);
+            ctx.lineTo(q2Pos.x, q2Pos.y + 40);
+            ctx.stroke();
+
+            // Dimension line arrows
+            ctx.setLineDash([]);
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = 'bold 12px monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${r.toFixed(2)} m`, centerX, q1Pos.y + 55);
+
+            // Draw small limit markers on dimension lines
+            ctx.beginPath();
+            ctx.moveTo(q1Pos.x, q1Pos.y + 35); ctx.lineTo(q1Pos.x, q1Pos.y + 45);
+            ctx.moveTo(q2Pos.x, q2Pos.y + 35); ctx.lineTo(q2Pos.x, q2Pos.y + 45);
+            ctx.stroke();
+            ctx.restore();
+
+            // Draw Vector Arrows
+            const F = calculateForce(q1, q2, r);
+            const isRepulsive = (q1 * q2) > 0;
+
+            if (q1 !== 0 && q2 !== 0) {
+                if (isRepulsive) {
+                    // Repelling: Vectors point outwards away from the center line
+                    drawVector(q1Pos.x, q1Pos.y, -1, 0, F, true);
+                    drawVector(q2Pos.x, q2Pos.y, 1, 0, F, true);
+                } else {
+                    // Attracting: Vectors point inwards towards each other
+                    drawVector(q1Pos.x, q1Pos.y, 1, 0, F, false);
+                    drawVector(q2Pos.x, q2Pos.y, -1, 0, F, false);
+                }
+            }
+
+            // Draw Charge Particles
+            drawChargeParticle(q1Pos.x, q1Pos.y, q1, 'q₁');
+            drawChargeParticle(q2Pos.x, q2Pos.y, q2, 'q₂');
+        }
+
+        // Glowing fields proportional to charges
+        function drawInfluenceField(x, y, val) {
+            if (val === 0) return;
+            const radius = Math.abs(val) * 12;
+            const isPositive = val > 0;
+
+            const grad = ctx.createRadialGradient(x, y, 5, x, y, radius + 25);
+            if (isPositive) {
+                grad.addColorStop(0, 'rgba(239, 68, 68, 0.25)');
+                grad.addColorStop(1, 'rgba(239, 68, 68, 0)');
+            } else {
+                grad.addColorStop(0, 'rgba(59, 130, 246, 0.25)');
+                grad.addColorStop(1, 'rgba(59, 130, 246, 0)');
+            }
+
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(x, y, radius + 25, 0, 2 * Math.PI);
+            ctx.fill();
+        }
+
+        // Draw physical particle spherical styling
+        function drawChargeParticle(x, y, val, label) {
+            const isPositive = val > 0;
+            const isNeutral = val === 0;
+            const absVal = Math.abs(val);
+            
+            // Dynamic node sizing based on magnitude
+            const radius = 18 + (absVal * 1.2);
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, 2 * Math.PI);
+            
+            // 3D Spherical Radial Shading gradient
+            const grad = ctx.createRadialGradient(x - radius/4, y - radius/4, radius/10, x, y, radius);
+            if (isNeutral) {
+                grad.addColorStop(0, '#94a3b8');
+                grad.addColorStop(1, '#475569');
+                ctx.shadowColor = 'rgba(71, 85, 105, 0.5)';
+            } else if (isPositive) {
+                grad.addColorStop(0, '#fca5a5');
+                grad.addColorStop(1, '#dc2626');
+                ctx.shadowColor = 'rgba(220, 38, 38, 0.5)';
+            } else {
+                grad.addColorStop(0, '#93c5fd');
+                grad.addColorStop(1, '#2563eb');
+                ctx.shadowColor = 'rgba(37, 99, 235, 0.5)';
+            }
+
+            ctx.shadowBlur = 15;
+            ctx.fillStyle = grad;
+            ctx.fill();
+
+            // Highlight border
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            ctx.restore();
+
+            // Draw Symbol and Text values
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 15px system-ui';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            let signSymbol = '';
+            if (isPositive) signSymbol = '+';
+            else if (!isNeutral) signSymbol = '−';
+            else signSymbol = '0';
+            ctx.fillText(signSymbol, x, y);
+
+            // Label Tag under the charge node
+            ctx.fillStyle = '#e2e8f0';
+            ctx.font = '600 11px system-ui';
+            ctx.fillText(`${label} (${val >= 0 ? '+' : ''}${val} µC)`, x, y - radius - 8);
+        }
+
+        // Check if cursor clicked near particles
+        function getDistance(x1, y1, x2, y2) {
+            return Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
+        }
+
+        // Pointer event listeners on canvas for drag gestures
+        canvas.addEventListener('mousedown', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const clickY = e.clientY - rect.top;
+
+            if (getDistance(clickX, clickY, q1Pos.x, q1Pos.y) < q1Pos.radius + 10) {
+                isDragging = true;
+                dragTarget = 'q1';
+            } else if (getDistance(clickX, clickY, q2Pos.x, q2Pos.y) < q2Pos.radius + 10) {
+                isDragging = true;
+                dragTarget = 'q2';
+            }
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            
+            const centerX = (canvas.width / window.devicePixelRatio) / 2;
+
+            // Compute separation distance relative to the mouse offset
+            let newPixelDist;
+            if (dragTarget === 'q1') {
+                newPixelDist = Math.max(20, (centerX - mouseX) * 2);
+            } else {
+                newPixelDist = Math.max(20, (mouseX - centerX) * 2);
+            }
+
+            // Convert pixels back to real-world meters: (1m = 240 pixels ratio)
+            let newR = newPixelDist / 240;
+
+            // Clip between range parameters safely
+            newR = Math.max(0.15, Math.min(2.00, newR));
+            r = parseFloat(newR.toFixed(2));
+            sliderR.value = r;
+            syncValues();
+        });
+
+        window.addEventListener('mouseup', () => {
+            isDragging = false;
+            dragTarget = null;
+        });
+
+        // Touch gesture responsiveness for mobile/tablet screens
+        canvas.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 0) return;
+            const rect = canvas.getBoundingClientRect();
+            const clickX = e.touches[0].clientX - rect.left;
+            const clickY = e.touches[0].clientY - rect.top;
+
+            if (getDistance(clickX, clickY, q1Pos.x, q1Pos.y) < q1Pos.radius + 15) {
+                isDragging = true;
+                dragTarget = 'q1';
+                e.preventDefault();
+            } else if (getDistance(clickX, clickY, q2Pos.x, q2Pos.y) < q2Pos.radius + 15) {
+                isDragging = true;
+                dragTarget = 'q2';
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        canvas.addEventListener('touchmove', (e) => {
+            if (!isDragging || e.touches.length === 0) return;
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.touches[0].clientX - rect.left;
+            const centerX = (canvas.width / window.devicePixelRatio) / 2;
+
+            let newPixelDist;
+            if (dragTarget === 'q1') {
+                newPixelDist = Math.max(20, (centerX - mouseX) * 2);
+            } else {
+                newPixelDist = Math.max(20, (mouseX - centerX) * 2);
+            }
+
+            let newR = newPixelDist / 240;
+            newR = Math.max(0.15, Math.min(2.00, newR));
+            r = parseFloat(newR.toFixed(2));
+            sliderR.value = r;
+            syncValues();
+            e.preventDefault();
+        }, { passive: false });
+
+        canvas.addEventListener('touchend', () => {
+            isDragging = false;
+            dragTarget = null;
+        });
+
+        // Synchronize interface data
+        function syncValues() {
+            // Read active parameters
+            q1 = parseInt(sliderQ1.value);
+            q2 = parseInt(sliderQ2.value);
+            r = parseFloat(sliderR.value);
+
+            // Text labels
+            textQ1.innerText = (q1 >= 0 ? '+' : '') + q1 + ' µC';
+            textQ2.innerText = (q2 >= 0 ? '+' : '') + q2 + ' µC';
+            textR.innerText = r.toFixed(2) + ' m';
+
+            badgeQ1.innerText = (q1 >= 0 ? '+' : '') + q1.toFixed(1) + ' µC';
+            badgeQ2.innerText = (q2 >= 0 ? '+' : '') + q2.toFixed(1) + ' µC';
+            badgeR.innerText = r.toFixed(2) + ' m';
+
+            // Calculate Force
+            const F = calculateForce(q1, q2, r);
+
+            // Display values
+            if (q1 === 0 || q2 === 0) {
+                forceDisplay.innerText = "0.0000 N";
+                vectorBadge.className = "mt-2 text-xs font-semibold px-2.5 py-1 rounded-lg border w-fit flex items-center gap-1.5 bg-slate-900 border-slate-700 text-slate-400";
+                vectorBadge.innerHTML = `<i class="fa-solid fa-circle-notch"></i> No Interaction (Neutral)`;
+            } else {
+                forceDisplay.innerText = F.toFixed(4) + " N";
+                const isRepulsive = (q1 * q2) > 0;
+                if (isRepulsive) {
+                    vectorBadge.className = "mt-2 text-xs font-semibold px-2.5 py-1 rounded-lg border w-fit flex items-center gap-1.5 bg-red-500/10 border-red-500/20 text-red-400";
+                    vectorBadge.innerHTML = `<i class="fa-solid fa-arrows-split-up-and-left"></i> Repulsive Force`;
+                } else {
+                    vectorBadge.className = "mt-2 text-xs font-semibold px-2.5 py-1 rounded-lg border w-fit flex items-center gap-1.5 bg-blue-500/10 border-blue-500/20 text-blue-400";
+                    vectorBadge.innerHTML = `<i class="fa-solid fa-arrows-to-dot"></i> Attractive Force`;
+                }
+            }
+
+            // Math panel updates
+            const chargeProductExponent = (Math.abs(q1 * q2) * 1e-12).toExponential(3);
+            mathCharges.innerHTML = `|${q1} &times; 10⁻⁶ &times; ${q2} &times; 10⁻⁶| = ${chargeProductExponent} C²`;
+            mathDistance.innerHTML = `(${r.toFixed(2)})² = ${(r*r).toFixed(4)} m²`;
+            mathFinalFormula.innerHTML = `F = 8.988 &times; 10⁹ &times; (${chargeProductExponent}) / ${(r*r).toFixed(4)} = ${F.toFixed(4)} N`;
+
+            // Draw Updated Canvas and Chart Highlight Dot
+            drawSimulation();
+            updateChartHighlight();
+        }
+
+        // Initialize Chart.js Data curve
+        function initChart() {
+            const rSamples = [];
+            const forceSamples = [];
+
+            // Compute steady curve baseline values based on default starting charges
+            for (let d = 0.15; d <= 2.0; d += 0.02) {
+                rSamples.push(parseFloat(d.toFixed(2)));
+                forceSamples.push(calculateForce(q1, q2, d));
+            }
+
+            forceChart = new Chart(chartCanvas, {
+                type: 'line',
+                data: {
+                    labels: rSamples,
+                    datasets: [
+                        {
+                            label: 'Static $1/r²$ Decay Line',
+                            data: forceSamples,
+                            borderColor: '#34d399',
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            fill: false,
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Active Point',
+                            data: [], // Filled dynamically
+                            backgroundColor: '#fbbf24',
+                            borderColor: '#ffffff',
+                            pointRadius: 6,
+                            pointHoverRadius: 8,
+                            showLine: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            min: 0.15,
+                            max: 2.0,
+                            grid: { color: 'rgba(51, 65, 85, 0.2)' },
+                            ticks: { color: '#94a3b8', font: { size: 10 } },
+                            title: { display: true, text: 'Distance r (meters)', color: '#64748b', font: { size: 11, weight: 'bold' } }
+                        },
+                        y: {
+                            grid: { color: 'rgba(51, 65, 85, 0.2)' },
+                            ticks: { color: '#94a3b8', font: { size: 10 } },
+                            title: { display: true, text: 'Force F (Newtons)', color: '#64748b', font: { size: 11, weight: 'bold' } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Live Coordinate Dot Position updates
+        function updateChartHighlight() {
+            if (!forceChart) return;
+
+            // Recalculate entire curve points when charges scale magnitudes
+            const rSamples = [];
+            const forceSamples = [];
+            for (let d = 0.15; d <= 2.0; d += 0.02) {
+                rSamples.push(parseFloat(d.toFixed(2)));
+                forceSamples.push(calculateForce(q1, q2, d));
+            }
+
+            // Update main line curve
+            forceChart.data.datasets[0].data = forceSamples.map((y, idx) => ({ x: rSamples[idx], y: y }));
+
+            // Update pulsating golden coordinate tracking dot
+            const currentF = calculateForce(q1, q2, r);
+            forceChart.data.datasets[1].data = [{ x: r, y: currentF }];
+
+            // Redraw chart view
+            forceChart.update('none'); // Update smoothly without visual delays
+        }
+
+        // Handle Window resizing cleanly
+        window.addEventListener('resize', resizeCanvas);
+
+        // Bind sliders events to dynamic updating
+        [sliderQ1, sliderQ2, sliderR].forEach(slider => {
+            slider.addEventListener('input', syncValues);
+        });
+
+        // Initialize App on DOM completion
+        window.addEventListener('load', () => {
+            resizeCanvas();
+            initChart();
+            syncValues();
+        });
+    </script>
+</body>
+</html>
+
+
+### Verification of Features Added:
+- **Interactive Drag-and-Drop Physics Workspace**: The user can interact with the system by holding down their mouse or finger on the particles inside the viewport and moving them to change their separation distance.
+- **Continuous 2D Plotting**: Built using Chart.js, the curve of the inverse-square law adapts on the fly to reflect changes in charge magnitude. A yellow tracking coordinate marker floats smoothly along the curve.
+- **Accurate Mathematical Visuals**: Includes live substitutions to keep real-time scientific calculations completely transparent.
