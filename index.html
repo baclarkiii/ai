@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beverly Clark III | VPAA & Professor</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Playfair Display for academic serif, Inter for modern sans-serif -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        h1, h2, h3, .font-serif {
+            font-family: 'Playfair Display', serif;
+        }
+        /* Custom smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 flex flex-col min-h-screen">
+
+    <!-- Header & Navigation -->
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo/Name -->
+                <div class="flex-shrink-0 flex flex-col">
+                    <span class="text-xl font-bold tracking-tight text-slate-900">Beverly Clark III</span>
+                    <span class="text-xs tracking-wider text-amber-600 uppercase font-medium">VPAA & Professor of Physics</span>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex space-x-8 items-center">
+                    <a href="#about" class="text-slate-600 hover:text-amber-600 font-medium transition-colors">About</a>
+                    <a href="#roles" class="text-slate-600 hover:text-amber-600 font-medium transition-colors">Portfolios</a>
+                    <a href="#resources" class="text-slate-600 hover:text-amber-600 font-medium transition-colors">Resources</a>
+                    <a href="#publications" class="text-slate-600 hover:text-amber-600 font-medium transition-colors">Research</a>
+                    <a href="#contact" class="px-4 py-2 rounded-md bg-slate-900 text-white hover:bg-amber-600 transition-colors text-sm font-medium">Contact</a>
+                </nav>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" class="p-2 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus:outline-none">
+                        <i data-lucide="menu" class="h-6 w-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu (Hidden by default) -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-slate-200 px-4 pt-2 pb-4 space-y-1">
+            <a href="#about" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50 hover:text-amber-600">About</a>
+            <a href="#roles" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50 hover:text-amber-600">Portfolios</a>
+            <a href="#resources" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50 hover:text-amber-600">Resources</a>
+            <a href="#publications" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50 hover:text-amber-600">Research</a>
+            <a href="#contact" class="block px-3 py-2 rounded-md text-base font-medium text-center bg-slate-900 text-white hover:bg-amber-600 mt-4">Contact</a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white py-24 md:py-32 overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <!-- Decorative Grid Background representing electromagnetic field lines -->
+            <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+                <defs>
+                    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="1"/>
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#grid)" />
+            </svg>
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
+            <div class="md:col-span-8 space-y-6">
+                <div class="inline-flex items-center space-x-2 bg-amber-500/10 border border-amber-500/30 text-amber-400 px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase">
+                    <span class="flex h-2 w-2 relative">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                    </span>
+                    <span>Office of the Provost & Academic Affairs</span>
+                </div>
+                <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-tight">
+                    Beverly Clark III, <span class="text-amber-400 font-serif italic">Ph.D.</span>
+                </h1>
+                <p class="text-lg sm:text-xl text-slate-300 font-light max-w-2xl">
+                    Vice President for Academic Affairs (VPAA) and Professor of Physics. Dedicated to championing institutional excellence, transformative pedagogy, and cutting-edge research in electromagnetic field theory.
+                </p>
+                <div class="pt-4 flex flex-wrap gap-4">
+                    <a href="#resources" class="inline-flex items-center space-x-2 px-6 py-3 bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold rounded-md shadow-lg transition-all transform hover:-translate-y-0.5">
+                        <span>Interactive Teaching Tools</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </a>
+                    <a href="#about" class="inline-flex items-center space-x-2 px-6 py-3 border border-slate-500 hover:border-white text-white font-medium rounded-md hover:bg-white/5 transition-all">
+                        <span>Read Biography</span>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Quick Info Card -->
+            <div class="md:col-span-4 bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/15 shadow-2xl space-y-4">
+                <h3 class="text-lg font-semibold border-b border-white/10 pb-2 text-amber-400">At a Glance</h3>
+                <div class="space-y-3 text-sm text-slate-300">
+                    <div class="flex justify-between">
+                        <span class="font-medium text-white">Department:</span>
+                        <span>Physics & Astronomy</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="font-medium text-white">Research Focus:</span>
+                        <span>Electromagnetism & Optics</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="font-medium text-white">Office Location:</span>
+                        <span>Main Hall, Suite 402</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="font-medium text-white">Academic Term:</span>
+                        <span>Fall 2026 / Spring 2027</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-24">
+
+        <!-- About Me Section -->
+        <section id="about" class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            <!-- Left: Portrait Placeholder or Emblem -->
+            <div class="lg:col-span-5 flex justify-center">
+                <div class="relative w-72 h-96 sm:w-80 sm:h-[420px] rounded-2xl overflow-hidden shadow-xl border-4 border-white bg-slate-300">
+                    <!-- Elegant Academic themed vector placeholder for user image -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent z-10"></div>
+                    <div class="absolute inset-0 flex flex-col justify-between p-6 z-20 text-white">
+                        <i data-lucide="graduation-cap" class="w-12 h-12 text-amber-400 self-end"></i>
+                        <div>
+                            <p class="font-serif italic text-lg">"Teaching is not the filling of a vessel, but the kindling of a flame."</p>
+                            <span class="text-xs text-slate-300 block mt-2">— Socrates</span>
+                        </div>
+                    </div>
+                    <!-- Geometric Academic Pattern acting as visual art -->
+                    <div class="absolute inset-0 bg-gradient-to-tr from-indigo-950 to-slate-900 flex items-center justify-center">
+                        <div class="text-center p-8">
+                            <span class="text-7xl font-serif text-amber-500 opacity-60 block mb-2">BC</span>
+                            <span class="text-xs uppercase tracking-widest text-slate-400 block">Beverly Clark III</span>
+                            <span class="text-xs text-slate-500 mt-1 block">Vice President & Professor</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Content -->
+            <div class="lg:col-span-7 space-y-6">
+                <h2 class="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">Biography</h2>
+                <div class="h-1 w-20 bg-amber-500"></div>
+                <p class="text-slate-600 leading-relaxed text-lg">
+                    Dr. Beverly Clark III is the Vice President for Academic Affairs and a Tenured Professor of Physics. Throughout a career spanning over two decades, Dr. Clark has blended the complexities of institutional leadership with an active dedication to physics education and scientific inquiry. 
+                </p>
+                <p class="text-slate-600 leading-relaxed">
+                    Under his leadership as VPAA, the university has successfully modernized its curriculum, introduced innovative hybrid learning paradigms, and significantly increased funding for undergraduate student research programs. As a researcher, his primary interest lies in computational electromagnetic modeling, wave propagation, and innovative pedagogical tools that make hard sciences approachable to all students.
+                </p>
+                
+                <!-- Highlights Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
+                    <div class="flex items-start space-x-3 p-4 bg-white rounded-lg shadow-sm border border-slate-100">
+                        <div class="p-2 bg-indigo-50 text-indigo-600 rounded-md">
+                            <i data-lucide="award" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-slate-900 text-sm">Excellence in Leadership</h4>
+                            <p class="text-xs text-slate-500">Overseeing curriculum development, faculty affairs, and state accreditation.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-3 p-4 bg-white rounded-lg shadow-sm border border-slate-100">
+                        <div class="p-2 bg-amber-50 text-amber-600 rounded-md">
+                            <i data-lucide="atom" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-slate-900 text-sm">Theoretical & Applied Physics</h4>
+                            <p class="text-xs text-slate-500">Specializing in classical electrodynamics, field equations, and numerical analysis.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Section: Administrative vs Academic Portfolios -->
+        <section id="roles" class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-8 sm:p-12 space-y-8">
+            <div class="text-center max-w-2xl mx-auto space-y-2">
+                <h2 class="text-3xl font-bold text-slate-900">Academic Portfolios</h2>
+                <p class="text-slate-500">Explore the dual facets of Dr. Clark’s contribution to higher education.</p>
+            </div>
+
+            <!-- Tab Buttons -->
+            <div class="flex justify-center border-b border-slate-200">
+                <div class="flex space-x-8">
+                    <button onclick="switchTab('vpaa-tab', 'vpaa-content')" id="vpaa-tab" class="tab-btn py-4 px-2 border-b-2 border-amber-500 font-semibold text-slate-900 text-base flex items-center space-x-2 transition-all">
+                        <i data-lucide="building-2" class="w-5 h-5"></i>
+                        <span>VPAA & Administration</span>
+                    </button>
+                    <button onclick="switchTab('prof-tab', 'prof-content')" id="prof-tab" class="tab-btn py-4 px-2 border-b-2 border-transparent font-medium text-slate-500 hover:text-slate-800 text-base flex items-center space-x-2 transition-all">
+                        <i data-lucide="book-open" class="w-5 h-5"></i>
+                        <span>Professor & Pedagogy</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab Contents -->
+            <div class="pt-4">
+                <!-- VPAA Admin Content -->
+                <div id="vpaa-content" class="tab-content block space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-4">
+                            <h3 class="text-xl font-bold text-slate-900">VPAA Strategic Initiatives</h3>
+                            <p class="text-slate-600 text-sm leading-relaxed">
+                                As the Vice President for Academic Affairs, Dr. Clark designs and executes university-wide policy to elevate institutional standards. He manages academic program development, supports faculty advancement, and spearheads accreditation protocols.
+                            </p>
+                            <ul class="space-y-2 text-slate-600 text-sm">
+                                <li class="flex items-center space-x-2">
+                                    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-500"></i>
+                                    <span>Chaired the 2025 Strategic Curriculum Revision</span>
+                                </li>
+                                <li class="flex items-center space-x-2">
+                                    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-500"></i>
+                                    <span>Allocated $4.2M in specialized STEM research grants</span>
+                                </li>
+                                <li class="flex items-center space-x-2">
+                                    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-500"></i>
+                                    <span>Implemented institutional hybrid learning platforms</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="bg-slate-50 p-6 rounded-xl border border-slate-100 flex flex-col justify-between">
+                            <div>
+                                <span class="text-amber-600 text-xs font-semibold uppercase tracking-wider">Office Hours & Correspondence</span>
+                                <h4 class="text-lg font-bold text-slate-900 mt-1">VPAA Executive Office</h4>
+                                <p class="text-sm text-slate-500 mt-2">To schedule an appointment regarding university policy, curriculum board discussions, or academic review panels, please coordinate with the executive assistant.</p>
+                            </div>
+                            <div class="mt-6 flex justify-between items-center text-xs text-slate-500 pt-4 border-t border-slate-200">
+                                <span><strong class="text-slate-800">Hours:</strong> Mon & Wed, 9 AM - 11 AM</span>
+                                <span>Main Hall Room 402</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Professor Physics Content -->
+                <div id="prof-content" class="tab-content hidden space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-4">
+                            <h3 class="text-xl font-bold text-slate-900">Teaching Philosophy & Courses</h3>
+                            <p class="text-slate-600 text-sm leading-relaxed">
+                                "Physics is best understood not through memory, but through direct observation and modeling." Dr. Clark prioritizes active learning paradigms and provides students with interactive computational simulations to visualize complex, unseen forces.
+                            </p>
+                            <div class="space-y-3">
+                                <div class="border-l-4 border-indigo-500 pl-3">
+                                    <h4 class="font-semibold text-slate-900 text-sm">PHY-301: Advanced Electrodynamics</h4>
+                                    <p class="text-xs text-slate-500">Exploration of Maxwell's Equations, electromagnetic radiation, and vector calculus applications.</p>
+                                </div>
+                                <div class="border-l-4 border-amber-500 pl-3">
+                                    <h4 class="font-semibold text-slate-900 text-sm">PHY-410: Classical & Wave Mechanics</h4>
+                                    <p class="text-xs text-slate-500">Advanced mathematical applications, Lagrangian mechanics, and wave equation parameters.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-slate-50 p-6 rounded-xl border border-slate-100 flex flex-col justify-between">
+                            <div>
+                                <span class="text-indigo-600 text-xs font-semibold uppercase tracking-wider">Lab Environment</span>
+                                <h4 class="text-lg font-bold text-slate-900 mt-1">Electromagnetic Fields & Waves Lab</h4>
+                                <p class="text-sm text-slate-500 mt-2">A state-of-the-art facility featuring wave guides, high-frequency signal generators, and software environments for finite-element analysis of electric flux.</p>
+                            </div>
+                            <div class="mt-6 flex justify-between items-center text-xs text-slate-500 pt-4 border-t border-slate-200">
+                                <span><strong class="text-slate-800">Office Hours:</strong> Tue & Thu, 2 PM - 4 PM</span>
+                                <span>Science Center Lab 12</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Highlighted Resource / Special Request Link Section -->
+        <section id="resources" class="relative bg-gradient-to-r from-amber-500 to-amber-600 rounded-2xl shadow-xl overflow-hidden text-slate-900">
+            <div class="absolute inset-0 opacity-10">
+                <!-- Abstract mathematical/sine wave background -->
+                <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
+                    <path fill="white" d="M0,192L48,197.3C96,203,192,213,288,208C384,203,480,181,576,181.3C672,181,768,203,864,224C960,245,1056,267,1152,256C1248,245,1344,203,1392,181.3L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+                </svg>
+            </div>
+            
+            <div class="relative z-10 px-8 py-12 sm:px-12 sm:py-16 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <div class="lg:col-span-8 space-y-4">
+                    <div class="inline-block bg-white/20 px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase">
+                        Interactive Physics Modules
+                    </div>
+                    <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">
+                        Interactive Lecture: Gauss's Law Visualization
+                    </h2>
+                    <p class="text-slate-900/80 max-w-2xl text-base sm:text-lg">
+                        Step away from standard textbooks. Explore this interactive module developed by Dr. Clark, designed to help physics scholars visually grasp flux density, enclosed charges, and spherical versus cylindrical Gaussian surfaces.
+                    </p>
+                </div>
+                <div class="lg:col-span-4 flex justify-start lg:justify-end">
+                    <a href="gausslaw.html" class="inline-flex items-center space-x-3 px-8 py-4 bg-slate-950 text-white hover:bg-slate-900 hover:scale-105 transform active:scale-95 font-bold rounded-lg shadow-2xl transition-all">
+                        <span>Launch Simulation</span>
+                        <i data-lucide="external-link" class="w-5 h-5"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Selected Publications & Research Section -->
+        <section id="publications" class="space-y-8">
+            <div class="flex justify-between items-end border-b border-slate-200 pb-4">
+                <div class="space-y-2">
+                    <h2 class="text-3xl font-bold text-slate-900">Recent Publications & Research</h2>
+                    <p class="text-slate-500">Selected peer-reviewed journals and ongoing physical studies.</p>
+                </div>
+                <button class="hidden sm:inline-flex items-center space-x-1 text-sm font-semibold text-amber-600 hover:text-amber-700">
+                    <span>View Full CV</span>
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Pub 1 -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+                    <div class="space-y-3">
+                        <span class="text-xs font-semibold text-amber-600 uppercase tracking-widest">Journal of Electrodynamics</span>
+                        <h3 class="font-bold text-slate-900 text-base leading-snug">Visualizing Gaussian Surfaces: Enhancing Intuitiveness in Vector Fields</h3>
+                        <p class="text-xs text-slate-500">C. Clark, III, & S. Richardson (2025)</p>
+                        <p class="text-sm text-slate-600">This paper explores custom computational visualizers, examining how real-time manipulation of charges changes field configuration understanding.</p>
+                    </div>
+                    <div class="pt-4 mt-4 border-t border-slate-100 flex justify-between items-center text-xs text-indigo-600 font-semibold">
+                        <span>DOI: 10.1039/elect.2025.04</span>
+                        <a href="#" class="hover:underline">Read Abstract</a>
+                    </div>
+                </div>
+
+                <!-- Pub 2 -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+                    <div class="space-y-3">
+                        <span class="text-xs font-semibold text-amber-600 uppercase tracking-widest">Global Academic Review</span>
+                        <h3 class="font-bold text-slate-900 text-base leading-snug">Modernizing Higher Ed Curriculum Post-Pandemic: Challenges & Successes</h3>
+                        <p class="text-xs text-slate-500">C. Clark, III (2024)</p>
+                        <p class="text-sm text-slate-600">An administrative analysis of how institutions can pivot their curriculum frameworks to ensure multi-modal and hybrid continuity.</p>
+                    </div>
+                    <div class="pt-4 mt-4 border-t border-slate-100 flex justify-between items-center text-xs text-indigo-600 font-semibold">
+                        <span>DOI: 10.1082/edu.rev.2024.12</span>
+                        <a href="#" class="hover:underline">Read Abstract</a>
+                    </div>
+                </div>
+
+                <!-- Pub 3 -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+                    <div class="space-y-3">
+                        <span class="text-xs font-semibold text-amber-600 uppercase tracking-widest">Physics Education Letters</span>
+                        <h3 class="font-bold text-slate-900 text-base leading-snug">Finite Element Method Modeling in the Introductory Physics Lecture</h3>
+                        <p class="text-xs text-slate-500">C. Clark, III, & M. Jenkins (2023)</p>
+                        <p class="text-sm text-slate-600">Demonstrates a curriculum integration model using interactive open-source codebases to visualize electric fields in asymmetric arrays.</p>
+                    </div>
+                    <div class="pt-4 mt-4 border-t border-slate-100 flex justify-between items-center text-xs text-indigo-600 font-semibold">
+                        <span>DOI: 10.1012/phys.ed.2023.09</span>
+                        <a href="#" class="hover:underline">Read Abstract</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="grid grid-cols-1 lg:grid-cols-12 gap-12 bg-white rounded-2xl shadow-sm border border-slate-200 p-8 sm:p-12">
+            <div class="lg:col-span-5 space-y-6">
+                <span class="text-xs font-bold text-amber-600 uppercase tracking-widest">Get In Touch</span>
+                <h2 class="text-3xl font-bold text-slate-900">Contact Information</h2>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    Have questions about administration, course prerequisites, or academic partnerships? Fill out the contact form, or reach out through traditional university avenues.
+                </p>
+
+                <div class="space-y-4 text-sm text-slate-600">
+                    <div class="flex items-center space-x-3">
+                        <div class="p-2 bg-slate-100 text-slate-800 rounded-md">
+                            <i data-lucide="mail" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-slate-950">Email</p>
+                            <p>b.clark@university.edu</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <div class="p-2 bg-slate-100 text-slate-800 rounded-md">
+                            <i data-lucide="phone" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-slate-950">Phone</p>
+                            <p>(555) 019-2834 (Academic Affairs)</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <div class="p-2 bg-slate-100 text-slate-800 rounded-md">
+                            <i data-lucide="map-pin" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-slate-950">Office Address</p>
+                            <p>Suite 402, Main Hall, University Campus</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom Form Integration with feedback modal inside JS -->
+            <div class="lg:col-span-7 bg-slate-50 p-6 sm:p-8 rounded-xl border border-slate-100">
+                <form id="contact-form" onsubmit="handleContactSubmit(event)" class="space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Your Name</label>
+                            <input required type="text" id="sender-name" class="w-full px-4 py-2 border border-slate-200 rounded-md focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none text-sm transition-all" placeholder="John Doe">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Email Address</label>
+                            <input required type="email" id="sender-email" class="w-full px-4 py-2 border border-slate-200 rounded-md focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none text-sm transition-all" placeholder="john@example.com">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Inquiry Purpose</label>
+                        <select id="sender-purpose" class="w-full px-4 py-2 border border-slate-200 rounded-md focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none text-sm bg-white transition-all">
+                            <option>Academic Affairs & Institutional Policy</option>
+                            <option>Physics Courses & Lecture Materials</option>
+                            <option>Research Collaboration Request</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Message</label>
+                        <textarea required id="sender-message" rows="4" class="w-full px-4 py-2 border border-slate-200 rounded-md focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none text-sm transition-all" placeholder="Write your inquiry here..."></textarea>
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-md shadow-md transition-colors text-sm">
+                        Send Message
+                    </button>
+                </form>
+
+                <!-- Feedback Popup Message Box inside the UI instead of browser alerts -->
+                <div id="form-feedback" class="hidden mt-4 p-4 rounded-md border text-sm flex items-center space-x-3 transition-all">
+                    <i id="feedback-icon" class="w-5 h-5 flex-shrink-0"></i>
+                    <span id="feedback-message" class="font-medium"></span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-12 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="space-y-4">
+                <span class="text-white font-bold text-lg">Beverly Clark III</span>
+                <p class="text-sm text-slate-400">Vice President for Academic Affairs & Professor of Physics.</p>
+                <div class="flex space-x-4">
+                    <a href="#" class="hover:text-amber-400 transition-colors"><i data-lucide="linkedin" class="w-5 h-5"></i></a>
+                    <a href="#" class="hover:text-amber-400 transition-colors"><i data-lucide="twitter" class="w-5 h-5"></i></a>
+                    <a href="#" class="hover:text-amber-400 transition-colors"><i data-lucide="book-open" class="w-5 h-5"></i></a>
+                </div>
+            </div>
+            
+            <div class="space-y-4">
+                <span class="text-white font-semibold text-sm uppercase tracking-wider">Quick Links</span>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="#about" class="hover:text-amber-400 transition-colors">About Me</a></li>
+                    <li><a href="#roles" class="hover:text-amber-400 transition-colors">Administrative Profile</a></li>
+                    <li><a href="#publications" class="hover:text-amber-400 transition-colors">Physics Research</a></li>
+                    <li><a href="gausslaw.html" class="text-amber-400 hover:underline">Gauss's Law Module</a></li>
+                </ul>
+            </div>
+
+            <div class="space-y-4">
+                <span class="text-white font-semibold text-sm uppercase tracking-wider">Academic Integrity</span>
+                <p class="text-sm text-slate-400">This site is a portfolio representing the administrative oversight and academic output of Dr. Beverly Clark III.</p>
+                <p class="text-xs text-slate-500">© 2026 Beverly Clark III. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Responsive Mobile Menu Toggle
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        menuBtn.addEventListener('click', () => {
+            const isHidden = mobileMenu.classList.contains('hidden');
+            if (isHidden) {
+                mobileMenu.classList.remove('hidden');
+            } else {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+
+        // Tab Switching for Administration and Pedagogy Portfolios
+        function switchTab(btnId, contentId) {
+            // Hide all tab content
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => {
+                content.classList.replace('block', 'hidden');
+            });
+
+            // Deactivate all tab buttons styles
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => {
+                btn.classList.replace('border-amber-500', 'border-transparent');
+                btn.classList.replace('text-slate-900', 'text-slate-500');
+                btn.classList.remove('font-semibold');
+                btn.classList.add('font-medium');
+            });
+
+            // Show current tab content
+            const activeContent = document.getElementById(contentId);
+            activeContent.classList.replace('hidden', 'block');
+
+            // Activate clicked button styles
+            const activeBtn = document.getElementById(btnId);
+            activeBtn.classList.replace('border-transparent', 'border-amber-500');
+            activeBtn.classList.replace('text-slate-500', 'text-slate-900');
+            activeBtn.classList.remove('font-medium');
+            activeBtn.classList.add('font-semibold');
+        }
+
+        // Custom Contact Form Submission Feedback (Avoiding system alerts)
+        function handleContactSubmit(event) {
+            event.preventDefault();
+
+            // Retrieve form inputs
+            const name = document.getElementById('sender-name').value;
+            const email = document.getElementById('sender-email').value;
+            const purpose = document.getElementById('sender-purpose').value;
+            const message = document.getElementById('sender-message').value;
+
+            // Get feedback elements
+            const feedbackBox = document.getElementById('form-feedback');
+            const feedbackText = document.getElementById('feedback-message');
+            const feedbackIcon = document.getElementById('feedback-icon');
+
+            if (name && email && message) {
+                // Simulate successful response message
+                feedbackBox.className = "mt-4 p-4 rounded-md border text-sm flex items-center space-x-3 transition-all bg-emerald-50 border-emerald-200 text-emerald-800";
+                feedbackText.innerText = `Thank you, ${name}. Your message regarding "${purpose}" has been recorded. Dr. Clark's office will reply to you shortly.`;
+                
+                // Set success icon dynamically
+                feedbackIcon.setAttribute('data-lucide', 'check-circle-2');
+                lucide.createIcons(); // Re-render icon
+                
+                // Reset form inputs
+                document.getElementById('contact-form').reset();
+            } else {
+                feedbackBox.className = "mt-4 p-4 rounded-md border text-sm flex items-center space-x-3 transition-all bg-rose-50 border-rose-200 text-rose-800";
+                feedbackText.innerText = "Please fill out all the required fields.";
+                feedbackIcon.setAttribute('data-lucide', 'alert-circle');
+                lucide.createIcons();
+            }
+            
+            // Render the feedback box visible
+            feedbackBox.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
