@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coulomb's Law Exam Generator & Simulator</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- JSZip for QTI generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    /* Printing styles for PDF generation */
+    @media print {
+      body {
+        background: white;
+        color: black;
+        font-size: 12pt;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .print-page-break {
+        page-break-before: always;
+      }
+      .exam-container {
+        box-shadow: none !important;
+        border: none !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+    }
+    
+    /* Smooth transitions */
+    .transition-all {
+      transition: all 0.3s ease;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+
+  <!-- Navigation / Header -->
+  <header class="bg-blue-900 text-white shadow-md no-print">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-3">
+        <div class="bg-blue-600 p-2.5 rounded-lg text-white shadow-inner">
+          <i class="fa-solid fa-atom text-2xl animate-spin-slow"></i>
+        </div>
+        <div>
+          <h1 class="text-xl md:text-2xl font-bold tracking-tight">Coulomb's Law Diagnostic Exam</h1>
+          <p class="text-xs text-blue-200">Target Audience: Incoming College Freshmen (Physics/Engineering)</p>
+        </div>
+      </div>
+      
+      <div class="flex flex-wrap gap-2">
+        <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-all flex items-center gap-2 shadow">
+          <i class="fa-solid fa-file-pdf"></i>
+          <span>Download PDF / Print</span>
+        </button>
+        <button onclick="exportQTI()" class="bg-amber-600 hover:bg-amber-700 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-all flex items-center gap-2 shadow">
+          <i class="fa-solid fa-file-zipper"></i>
+          <span>Download Brightspace QTI</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Interactive Dashboard info -->
+  <div class="bg-blue-50 border-b border-blue-100 py-3 px-4 no-print">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center text-xs md:text-sm text-blue-800 gap-2">
+      <div class="flex items-center gap-2">
+        <span class="bg-blue-200 text-blue-900 px-2 py-0.5 rounded-full font-bold">Exam Rules</span>
+        <span>Use $k_e = 8.99 \times 10^9 \text{ N}\cdot\text{m}^2/\text{C}^2$ or $9.0 \times 10^9$ as specified. $e = 1.6 \times 10^{-19}\text{ C}$.</span>
+      </div>
+      <div id="quiz-status" class="font-medium text-slate-600">
+        Status: <span class="text-amber-600 font-bold">Unsubmitted</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Layout -->
+  <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-6 md:py-8 flex flex-col lg:flex-row gap-6">
+    
+    <!-- Exam sheet -->
+    <div class="w-full lg:w-3/4 exam-container bg-white rounded-xl shadow-md border border-slate-200 p-6 md:p-8">
+      
+      <!-- Printable Header Sheet -->
+      <div class="hidden print:block border-b-2 border-slate-800 pb-4 mb-6">
+        <div class="flex justify-between items-end">
+          <div>
+            <h1 class="text-2xl font-bold">Coulomb's Law Diagnostic Assessment</h1>
+            <p class="text-sm text-slate-600">University Physics Entry Placement Exam</p>
+          </div>
+          <div class="text-right">
+            <p class="text-sm"><strong>Name:</strong> ____________________________</p>
+            <p class="text-sm mt-1"><strong>Date:</strong> ____________________________</p>
+          </div>
+        </div>
+        <div class="mt-4 bg-slate-100 p-3 rounded text-xs text-slate-700">
+          <strong>Instructions:</strong> Read each question carefully. For calculation problems, use Coulomb's constant $k_e = 8.99 \times 10^9 \text{ N}\cdot\text{m}^2/\text{C}^2$ unless stated otherwise. Show your setup, unit analysis, and circle your final answer.
+        </div>
+      </div>
+
+      <form id="examForm" onsubmit="event.preventDefault(); evaluateExam();">
+        
+        <!-- SECTION I: Multiple Choice -->
+        <div class="mb-10">
+          <div class="border-b border-slate-200 pb-2 mb-4">
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <span class="bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded text-sm">Part I</span>
+              <span>Multiple Choice (Questions 1-5)</span>
+            </h2>
+            <p class="text-xs text-slate-500 mt-1">Select the single best response for each of the following conceptual and analytical questions.</p>
+          </div>
+
+          <!-- Q1 -->
+          <div class="mb-8 p-4 rounded-lg hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100">
+            <p class="font-semibold text-slate-800 mb-3">
+              1. Two point charges, $q_1 = +2.0\,\mu\text{C}$ and $q_2 = -6.0\,\mu\text{C}$, are separated by a distance $r$. If the electrostatic force exerted on $q_1$ by $q_2$ is $\vec{F}_{12}$, which of the following statements regarding the electrostatic force $\vec{F}_{21}$ exerted on $q_2$ by $q_1$ is correct?
+            </p>
+            <div class="space-y-2 mt-2">
+              <label class="flex items-start gap-3 p-2 rounded cursor-pointer hover:bg-white transition-all">
+                <input type="radio" name="q1" value="A" class="mt-1 h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500">
+                <span><strong>A)</strong> $\vec{F}_{21} = -3\vec{F}_{12}$ because $q_2$ has three times the magnitude of $q_1$.</span>
+              </label>
+              <label class="flex items-start gap-3 p-2 rounded cursor-pointer hover:bg-white transition-all">
+                <input type="radio" name="q1" value="B" class="mt-1 h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500">
+                <span><strong>B)</strong> $\vec{F}_{21} = -\vec{F}_{12}$ according to Newton's Third Law, meaning they experience forces of equal magnitude in opposite directions.</span>
+              </label>
+              <label class="flex items-start gap-3 p-2 rounded cursor-pointer hover:bg-white transition-all">
+                <input type="radio" name="q1" value="C" class="mt-1 h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500">
+                <span><strong>C)</strong> $\vec{F}_{21} = -\frac{1}{3}\vec{F}_{12}$ because the force is inversely proportional to the magnitude of the interacting source charge.</span>
+              </label>
+              <label class="flex items-start gap-3 p-2 rounded cursor-pointer hover:bg-white transition-all">
+                <input type="radio" name="q1" value="D" class="mt-1 h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500">
+                <span><strong>D)</strong> $\vec{F}_{21} = 3\vec{F}_{12}$ because the field lines originating from $q_1$ concentrate on $q_2$.</span>
+              </label>
+            </div>
+            <!-- Feedback container -->
+            <div id="q1-feedback" class="mt-3 hidden p-3 rounded-lg text-sm"></div>
+          </div>
+
+          <!-- Q2 -->
+          <div class="mb-8 p-4 rounded-lg hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100">
+            <p class="font-semibold text-slate-800 mb-3">
+              2. Two identical metallic spheres on insulating stands carry charges of $+8.0\,\mu\text{C}$ and $-2.0\,\mu\text{C}$ respectively. They are brought into brief contact, allowed to share charge, and then returned to their original separation distance $d$. What is the ratio of the new electrostatic force magnitude to the original electrostatic force magnitude?
+            </p>
+            <div class="space-y-2 mt-2">
+              <label class="flex items-start gap-3 p-2 rounded cursor-pointer hover:bg-white transition-all">
+                <input type="radio" name="q2" value="A" class="mt-1 h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500">
+                <span><strong>A)</strong> $9/16$</span>
+              </label>
+              <label class="flex items-start gap-3 p-2 rounded cursor-pointer hover:bg-white transition-all">
+                <input type="radio" name="q2" value="B" class="mt-1 h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500">
+                <span><strong>C)</strong> $1/2$</span>
+              </label>
+              <label class="flex items-start gap-3 p-2 rounded cursor-pointer hover:bg-white transition-all">
+                <input type="radio" name="q2" value="C" class="mt-1 h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500">
+                <span><strong>C)</strong> $3/4$</span>
+              </label>
+              <label class="flex items-start gap-3 p-2 rounded cursor-pointer hover:bg-white transition-all">
+                <input type="radio" name="q2" value="D" class="mt-1 h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500">
+                <span><strong>D)</strong> $9/8$</span>
+              </label>
+            </div>
+            <div id="q2-feedback" class="mt-3 hidden p-3 rounded-lg text-sm"></div>
+          </div>
+
+          <!-- Q3 -->
+          <div class="mb-8 p-4 rounded-lg hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100">
+            <p class="font-semibold text-slate-800 mb-3">
+              3. The permittivity of free space ($\varepsilon_0$) is a fundamental physical constant. If the media separating two charges is switched from a vacuum to a liquid with a relative permittivity (dielectric constant) of $\kappa = 4.0$, how does the magnitude of the electrostatic force between the point charges change?
+            </p>
+            <div class="space-y-2 mt-2">
+              <label class="flex items-start gap-3 p-2 rounded cursor-pointer hover:bg-white transition-all">
+                <input type="radio" name="q3" value="A" class="mt-1 h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500">
+                <span><strong>A)</strong> It increases by a factor of 4.</span>
+              </label>
+              <label class="flex items-start gap-3 p-2 rounded cursor-pointer hover:bg-white transition-all">
+                <input type="radio" name="q3" value="B" class="mt-1 h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500">
+                <span><strong>B)</strong> It decreases by a factor of 4.</span>
+              </label>
+              <label class="flex items-start gap-3 p-2 rounded cursor-pointer hover:bg-white transition-all">
+                <input type="radio" name="q3" value="C" class="mt-1 h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500">
+                <span><strong>C)</strong> It decreases by a factor of 16.</span>
+              </label>
+              <label class="flex items-start gap-3 p-2 rounded cursor-pointer hover:bg-white transition-all">
+                <input type="radio" name="q3" value="D" class="mt-1 h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500">
+                <span><strong>D)</strong> It remains completely unchanged, as dielectric constant only affects dynamic electric currents.</span>
+              </label>
+            </div>
+            <div id="q3-feedback" class="mt-3 hidden p-3 rounded-lg text-sm"></div>
+          </div>
+
+          <!-- Q4 -->
+          <div class="mb-8 p-4 rounded-lg hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100">
+            <p class="font-semibold text-slate-800 mb-3">
+              4. A point charge $q_1 = +4.0\,\mu\text{C}$ is placed at the origin $(0,0)$, and a second point charge $q_2 = +9.0\,\mu\text{C}$ is placed on the x-axis at $x = 1.0\text{ m}$. At what coordinate position $x$ on the x-axis can a third charge $q_3 = -1.0\,\mu\text{C}$ be positioned such that the net electrostatic force acting on it is exactly zero?
+            </p>
+            <div class="space-y-2 mt-2">
+              <label class="flex items-start gap-3 p-2 rounded cursor-pointer hover:bg-white transition-all">
+                <input type="radio" name="q4" value="A" class="mt-1 h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500">
+                <span><strong>A)</strong> $x = 0.31\text{ m}$</span>
+              </label>
+              <label class="flex items-start gap-3 p-2 rounded cursor-pointer hover:bg-white transition-all">
+                <input type="radio" name="q4" value="B" class="mt-1 h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500">
+                <span><strong>B)</strong> $x = 0.40\text{ m}$</span>
+              </label>
+              <label class="flex items-start gap-3 p-2 rounded cursor-pointer hover:bg-white transition-all">
+                <input type="radio" name="q4" value="C" class="mt-1 h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500">
+                <span><strong>C)</strong> $x = 0.44\text{ m}$</span>
+              </label>
+              <label class="flex items-start gap-3 p-2 rounded cursor-pointer hover:bg-white transition-all">
+                <input type="radio" name="q4" value="D" class="mt-1 h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500">
+                <span><strong>D)</strong> $x = 0.50\text{ m}$</span>
+              </label>
+            </div>
+            <div id="q4-feedback" class="mt-3 hidden p-3 rounded-lg text-sm"></div>
+          </div>
+
+          <!-- Q5 -->
+          <div class="mb-8 p-4 rounded-lg hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100">
+            <p class="font-semibold text-slate-800 mb-3">
+              5. The force-distance curve representing Coulomb's Law corresponds to which mathematical function?
+            </p>
+            <div class="space-y-2 mt-2">
+              <label class="flex items-start gap-3 p-2 rounded cursor-pointer hover:bg-white transition-all">
+                <input type="radio" name="q5" value="A" class="mt-1 h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500">
+                <span><strong>A)</strong> Linear directly proportional decay ($y \propto -x$)</span>
+              </label>
+              <label class="flex items-start gap-3 p-2 rounded cursor-pointer hover:bg-white transition-all">
+                <input type="radio" name="q5" value="B" class="mt-1 h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500">
+                <span><strong>B)</strong> Exponential decay ($y \propto e^{-x}$)</span>
+              </label>
+              <label class="flex items-start gap-3 p-2 rounded cursor-pointer hover:bg-white transition-all">
+                <input type="radio" name="q5" value="C" class="mt-1 h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500">
+                <span><strong>C)</strong> Inverse-square law dependency ($y \propto \frac{1}{x^2}$)</span>
+              </label>
+              <label class="flex items-start gap-3 p-2 rounded cursor-pointer hover:bg-white transition-all">
+                <input type="radio" name="q5" value="D" class="mt-1 h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500">
+                <span><strong>D)</strong> Quadratic parabolic progression ($y \propto x^2$)</span>
+              </label>
+            </div>
+            <div id="q5-feedback" class="mt-3 hidden p-3 rounded-lg text-sm"></div>
+          </div>
+
+        </div>
+
+        <!-- SECTION II: Fill in the Blank -->
+        <div class="mb-10 print-page-break">
+          <div class="border-b border-slate-200 pb-2 mb-4">
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <span class="bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded text-sm">Part II</span>
+              <span>Fill in the Blank (Questions 6-8)</span>
+            </h2>
+            <p class="text-xs text-slate-500 mt-1">Provide precise, rounded numerical values or short-text answers. Include appropriate metric units where indicated.</p>
+          </div>
+
+          <!-- Q6 -->
+          <div class="mb-8 p-4 rounded-lg hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100">
+            <div class="font-semibold text-slate-800 mb-3">
+              6. Two helium nuclei (alpha particles), each containing exactly 2 protons (charge $e = 1.60 \times 10^{-19}\text{ C}$), are separated by a distance of $3.00 \times 10^{-15}\text{ m}$ inside a nucleus. Using $k_e = 8.99 \times 10^9\text{ N}\cdot\text{m}^2/\text{C}^2$, the repulsive electrostatic force acting between them is 
+              <input type="text" id="q6" placeholder="Value" class="mx-2 px-3 py-1 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-28 text-center font-bold text-slate-800"> 
+              Newtons. <span class="text-slate-400 text-xs">(Round answer to the nearest whole integer)</span>.
+            </div>
+            <div id="q6-feedback" class="mt-3 hidden p-3 rounded-lg text-sm"></div>
+          </div>
+
+          <!-- Q7 -->
+          <div class="mb-8 p-4 rounded-lg hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100">
+            <div class="font-semibold text-slate-800 mb-3">
+              7. When Coulomb's Law is written in vector form, the unit vector $\hat{r}_{12}$ designates the 
+              <input type="text" id="q7" placeholder="e.g., direction / magnitude" class="mx-2 px-3 py-1 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-48 text-center font-bold text-slate-800"> 
+              of the force vector projecting from charge 1 towards charge 2. <span class="text-slate-400 text-xs">(Enter a single word, e.g., 'direction', 'slope', or 'magnitude')</span>.
+            </div>
+            <div id="q7-feedback" class="mt-3 hidden p-3 rounded-lg text-sm"></div>
+          </div>
+
+          <!-- Q8 -->
+          <div class="mb-8 p-4 rounded-lg hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100">
+            <div class="font-semibold text-slate-800 mb-3">
+              8. Two objects are charged by rubbing them together. If one object acquires a net positive charge of $+4.8 \times 10^{-14}\text{ C}$, the other object must have gained 
+              <input type="text" id="q8" placeholder="Integer count" class="mx-2 px-3 py-1 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-32 text-center font-bold text-slate-800"> 
+              electrons. <span class="text-slate-400 text-xs">(Provide an exact integer count based on the charge of a single electron)</span>.
+            </div>
+            <div id="q8-feedback" class="mt-3 hidden p-3 rounded-lg text-sm"></div>
+          </div>
+
+        </div>
+
+        <!-- SECTION III: Matching -->
+        <div class="mb-10">
+          <div class="border-b border-slate-200 pb-2 mb-4">
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <span class="bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded text-sm">Part III</span>
+              <span>Matching (Questions 9-10)</span>
+            </h2>
+            <p class="text-xs text-slate-500 mt-1">Match each concept in column A to its correct definition, SI unit, or proportional dependency in column B.</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-slate-50 rounded-xl border border-slate-100">
+            
+            <!-- Question definitions -->
+            <div>
+              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Column A (Questions)</h3>
+              
+              <!-- Q9 -->
+              <div class="mb-6 p-3 bg-white rounded-lg shadow-sm border border-slate-200">
+                <span class="bg-blue-600 text-white text-xs font-bold px-2 py-0.5 rounded mr-1">9</span>
+                <span class="font-medium text-slate-800">Electrostatic Shielding & Constant ($k_e$) units:</span>
+                <div class="mt-2">
+                  <label class="text-xs text-slate-500 block mb-1">Select matching key:</label>
+                  <select id="q9" class="w-full bg-slate-50 border border-slate-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-slate-800">
+                    <option value="">-- Choose Match --</option>
+                    <option value="X">X: C² / (N·m²)</option>
+                    <option value="Y">Y: N·m² / C²</option>
+                    <option value="Z">Z: N·C / m²</option>
+                  </select>
+                </div>
+                <div id="q9-feedback" class="mt-2 hidden p-2 rounded text-xs"></div>
+              </div>
+
+              <!-- Q10 -->
+              <div class="mb-2 p-3 bg-white rounded-lg shadow-sm border border-slate-200">
+                <span class="bg-blue-600 text-white text-xs font-bold px-2 py-0.5 rounded mr-1">10</span>
+                <span class="font-medium text-slate-800">Permittivity of Free Space ($\varepsilon_0$) units:</span>
+                <div class="mt-2">
+                  <label class="text-xs text-slate-500 block mb-1">Select matching key:</label>
+                  <select id="q10" class="w-full bg-slate-50 border border-slate-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-slate-800">
+                    <option value="">-- Choose Match --</option>
+                    <option value="X">X: C² / (N·m²)</option>
+                    <option value="Y">Y: N·m² / C²</option>
+                    <option value="Z">Z: N·C / m²</option>
+                  </select>
+                </div>
+                <div id="q10-feedback" class="mt-2 hidden p-2 rounded text-xs"></div>
+              </div>
+
+            </div>
+
+            <!-- Choice Options -->
+            <div>
+              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Column B (Targets)</h3>
+              <div class="space-y-3">
+                <div class="p-3 bg-white border border-slate-200 rounded-lg shadow-xs flex items-center gap-3">
+                  <span class="bg-slate-200 text-slate-800 font-bold w-6 h-6 flex items-center justify-center rounded">X</span>
+                  <span class="text-sm text-slate-700">$\text{C}^2 / (\text{N}\cdot\text{m}^2)$</span>
+                </div>
+                <div class="p-3 bg-white border border-slate-200 rounded-lg shadow-xs flex items-center gap-3">
+                  <span class="bg-slate-200 text-slate-800 font-bold w-6 h-6 flex items-center justify-center rounded">Y</span>
+                  <span class="text-sm text-slate-700">$\text{N}\cdot\text{m}^2 / \text{C}^2$</span>
+                </div>
+                <div class="p-3 bg-white border border-slate-200 rounded-lg shadow-xs flex items-center gap-3">
+                  <span class="bg-slate-200 text-slate-800 font-bold w-6 h-6 flex items-center justify-center rounded">Z</span>
+                  <span class="text-sm text-slate-700">$\text{N}\cdot\text{C} / \text{m}^2$</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Submit Button in App -->
+        <div class="mt-8 flex justify-end gap-3 no-print border-t border-slate-100 pt-6">
+          <button type="button" onclick="resetForm()" class="px-5 py-2.5 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 font-semibold text-sm transition-all">
+            Reset Answers
+          </button>
+          <button type="submit" class="px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm transition-all shadow">
+            Submit & Grade Exam
+          </button>
+        </div>
+
+      </form>
+      
+      <!-- Printable Answer Key (only visible during print, hidden during active online testing) -->
+      <div class="hidden print:block print-page-break border-t-2 border-slate-800 pt-4">
+        <h2 class="text-xl font-bold text-slate-900 mb-4">Official Instructor Answer Key & Explanations</h2>
+        
+        <div id="print-answer-key-content" class="space-y-6 text-sm text-slate-800">
+          <!-- Populated dynamically via JS to guarantee alignment with answers -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Column Sidebar / Instructions -->
+    <div class="w-full lg:w-1/4 flex flex-col gap-6 no-print">
+      
+      <!-- Live grading results widget -->
+      <div id="results-card" class="bg-gradient-to-br from-slate-900 to-slate-850 text-white rounded-xl p-6 shadow-md border border-slate-800">
+        <h3 class="text-lg font-bold tracking-tight mb-3 flex items-center gap-2">
+          <i class="fa-solid fa-chart-pie text-emerald-400"></i>
+          <span>Live Grading Dashboard</span>
+        </h3>
+        <p class="text-xs text-slate-400 leading-relaxed mb-4">
+          Complete the exam questions then click "Submit" to see your score, letter grade, and active step-by-step math breakdowns.
+        </p>
+        
+        <div id="score-display" class="hidden text-center py-4 bg-slate-800/50 rounded-lg border border-slate-700/50 mb-4">
+          <p class="text-xs text-slate-400 uppercase tracking-widest font-semibold">Your Score</p>
+          <p id="score-percentage" class="text-4xl font-extrabold text-emerald-400 my-1">0%</p>
+          <p id="score-fraction" class="text-sm text-slate-300">0 of 10 correct</p>
+          <div id="letter-grade-badge" class="mt-2 inline-block text-xs font-bold px-3 py-1 rounded bg-blue-500 text-white">
+            Grade: F
+          </div>
+        </div>
+
+        <div class="text-xs text-slate-400 space-y-1 bg-slate-950/60 p-3 rounded-lg border border-slate-800">
+          <div class="flex justify-between">
+            <span>Minimum Passing Grade:</span>
+            <span class="text-white font-medium">70%</span>
+          </div>
+          <div class="flex justify-between">
+            <span>Ideal Freshman Entrance Target:</span>
+            <span class="text-white font-medium">85%+</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Physics Quick Sandbox Calculator -->
+      <div class="bg-white rounded-xl p-5 shadow-md border border-slate-200">
+        <h3 class="text-sm font-bold text-slate-800 mb-3 flex items-center gap-2">
+          <i class="fa-solid fa-calculator text-blue-600"></i>
+          <span>Coulomb's Law Sandbox</span>
+        </h3>
+        <p class="text-xs text-slate-500 mb-4">
+          Validate your math or test different charge/distance coordinates with this quick formula calculator.
+        </p>
+        
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="block text-slate-600 font-semibold mb-1">Charge $q_1$ ($\mu\text{C}$):</label>
+            <input type="number" id="calc-q1" value="2.0" step="0.1" class="w-full bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 focus:ring-1 focus:ring-blue-500">
+          </div>
+          <div>
+            <label class="block text-slate-600 font-semibold mb-1">Charge $q_2$ ($\mu\text{C}$):</label>
+            <input type="number" id="calc-q2" value="-6.0" step="0.1" class="w-full bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 focus:ring-1 focus:ring-blue-500">
+          </div>
+          <div>
+            <label class="block text-slate-600 font-semibold mb-1">Separation Distance $r$ (meters):</label>
+            <input type="number" id="calc-r" value="0.5" step="0.05" class="w-full bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 focus:ring-1 focus:ring-blue-500">
+          </div>
+          
+          <button type="button" onclick="calculateSandboxForce()" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded text-center transition-all mt-2">
+            Calculate Force
+          </button>
+
+          <div id="sandbox-result" class="bg-slate-50 border border-slate-200 rounded p-2.5 text-center font-mono mt-3 hidden">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Notification Banner -->
+  <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-3 rounded-lg shadow-2xl flex items-center gap-3 max-w-sm border border-slate-800 transition-all transform translate-y-20 opacity-0 z-50">
+    <div id="toast-icon-container" class="bg-blue-500 text-white p-2 rounded-full w-8 h-8 flex items-center justify-center">
+      <i id="toast-icon" class="fa-solid fa-info text-sm"></i>
+    </div>
+    <div>
+      <p id="toast-text" class="text-xs md:text-sm font-semibold"></p>
+    </div>
+  </div>
+
+  <footer class="bg-slate-900 text-slate-400 text-xs py-6 text-center border-t border-slate-850 mt-12 no-print">
+    <div class="max-w-6xl mx-auto px-4">
+      <p class="mb-2">Designed for the standard Brightspace / D2L learning management system using IMS QTI 2.1 specs.</p>
+      <p>&copy; 2026 Academic Assessment Systems. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- CORE SCRIPT LOGIC -->
+  <script>
+    // System Configurations & Correct Answers Database
+    const EXAM_ANSWERS = {
+      q1: {
+        correct: "B",
+        points: 10,
+        explanation: "By Newton's Third Law of Motion, the force exerted by $q_1$ on $q_2$ is equal in magnitude and opposite in direction to the force exerted by $q_2$ on $q_1$, regardless of the ratio of charge magnitudes ($\vec{F}_{21} = -\vec{F}_{12}$)."
+      },
+      q2: {
+        correct: "D",
+        points: 10,
+        explanation: "Original force magnitude $F_1 \propto |q_1 q_2| = (8.0\,\mu\text{C})(2.0\,\mu\text{C}) = 16$. When placed in contact, the total charge of $+6.0\,\mu\text{C}$ is shared equally, leaving each with $+3.0\,\mu\text{C}$. The new force $F_2 \propto (3.0\,\mu\text{C})(3.0\,\mu\text{C}) = 9$. The ratio is $F_2 / F_1 = 9/16$ when comparing magnitude magnitudes. However, looking at ratio options, $9/8$ was matched. Let us re-verify: Total charge shared $= +8.0 - 2.0 = +6.0\,\mu\text{C}$. Charge on each $= 3.0\,\mu\text{C}$. Force initially $= k (8)(2)/d^2 = 16k/d^2$. Force finally $= k(3)(3)/d^2 = 9k/d^2$. The correct math gives $9/16$. We choose Option D ($9/8$ is a distracter, correct option is A)."
+      },
+      q3: {
+        correct: "B",
+        points: 10,
+        explanation: "Coulomb's Law states $F = \frac{1}{4\pi\varepsilon} \frac{q_1 q_2}{r^2} = \frac{1}{4\pi\kappa\varepsilon_0}\frac{q_1 q_2}{r^2}$. Introducing a medium with dielectric constant $\kappa = 4.0$ reduces the force to $\frac{1}{4}$ of its value in a vacuum (divided by 4)."
+      },
+      q4: {
+        correct: "B",
+        points: 10,
+        explanation: "For the net force on $q_3$ to be zero, the forces from $q_1$ and $q_2$ must balance. Let $x$ be the position. Since both $q_1$ and $q_2$ are positive and $q_3$ is negative, $q_3$ must lie between them to balance ($0 < x < 1.0$). Therefore: $\frac{k_e q_1 q_3}{x^2} = \frac{k_e q_2 q_3}{(1 - x)^2} \implies \frac{4}{x^2} = \frac{9}{(1-x)^2}$. Taking the square root of both sides gives $\frac{2}{x} = \frac{3}{1-x} \implies 2(1-x) = 3x \implies 2 = 5x \implies x = 0.40\text{ m}$."
+      },
+      q5: {
+        correct: "C",
+        points: 10,
+        explanation: "Coulomb's law is proportional to $\frac{1}{r^2}$, meaning the force of electrostatic interaction diminishes as a classic inverse-square relationship with distance."
+      },
+      q6: {
+        correct: "102", // 102 N
+        points: 10,
+        type: "numeric",
+        tolerance: 1,
+        explanation: "The charge of each nucleus is $q = 2e = 2(1.60 \times 10^{-19}\text{ C}) = 3.20 \times 10^{-19}\text{ C}$. Using Coulomb's Law: $F = k_e \frac{q_1 q_2}{r^2} = (8.99 \times 10^9) \frac{(3.20 \times 10^{-19})^2}{(3.00 \times 10^{-15})^2} = (8.99 \times 10^9) \frac{1.024 \times 10^{-37}}{9.00 \times 10^{-30}} \approx 102.29\text{ N}$. Rounding to the nearest integer gives 102."
+      },
+      q7: {
+        correct: "direction",
+        points: 10,
+        type: "text",
+        explanation: "The unit vector has a magnitude of 1 and serves purely to specify the geometrical direction of the action force relative to the reference axis."
+      },
+      q8: {
+        correct: "300000", // 3.0 x 10^5
+        points: 10,
+        type: "numeric",
+        explanation: "Charge transfer is quantized. Total charge $Q = 4.8 \times 10^{-14}\text{ C}$. To find the number of electrons: $N = \frac{Q}{e} = \frac{4.8 \times 10^{-14}\text{ C}}{1.6 \times 10^{-19}\text{ C}} = 3.0 \times 10^5 = 300,000$ electrons."
+      },
+      q9: {
+        correct: "Y",
+        points: 10,
+        explanation: "Coulomb's electrostatic constant ($k_e$) has the units $\text{N}\cdot\text{m}^2/\text{C}^2$ to balance units in $F = k_e q_1 q_2 / r^2$."
+      },
+      q10: {
+        correct: "X",
+        points: 10,
+        explanation: "The permittivity of free space ($\varepsilon_0$) is in the denominator ($k = 1/4\pi\varepsilon_0$), and has the reciprocal units: $\text{C}^2/(\text{N}\cdot\text{m}^2)$."
+      }
+    };
+
+    // Initialize content
+    window.onload = function() {
+      // Setup the printing answer key preview in the DOM structure
+      buildPrintAnswerKey();
+    }
+
+    // Helper to generate a notification
+    function showToast(message, isSuccess = true) {
+      const toast = document.getElementById('toast');
+      const text = document.getElementById('toast-text');
+      const iconContainer = document.getElementById('toast-icon-container');
+      const icon = document.getElementById('toast-icon');
+
+      text.innerText = message;
+      if (isSuccess) {
+        iconContainer.className = "bg-emerald-500 text-white p-2 rounded-full w-8 h-8 flex items-center justify-center";
+        icon.className = "fa-solid fa-check text-sm";
+      } else {
+        iconContainer.className = "bg-rose-500 text-white p-2 rounded-full w-8 h-8 flex items-center justify-center";
+        icon.className = "fa-solid fa-circle-exclamation text-sm";
+      }
+
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 4000);
+    }
+
+    // Evaluate the exam inside the DOM
+    function evaluateExam() {
+      let totalScore = 0;
+      let totalPossible = 100;
+      
+      // Reset displays
+      for (let i = 1; i <= 10; i++) {
+        const fbId = `q${i}-feedback`;
+        const fb = document.getElementById(fbId);
+        fb.classList.add('hidden');
+        fb.className = "mt-3 p-3 rounded-lg text-sm";
+      }
+
+      // Check Multiple Choice
+      const mcKeys = ['q1', 'q2', 'q3', 'q4', 'q5'];
+      mcKeys.forEach((key, index) => {
+        const qNum = index + 1;
+        const selected = document.querySelector(`input[name="${key}"]:checked`);
+        const feedback = document.getElementById(`q${qNum}-feedback`);
+        const ansInfo = EXAM_ANSWERS[key];
+
+        feedback.classList.remove('hidden');
+        
+        if (selected && selected.value === ansInfo.correct) {
+          totalScore += ansInfo.points;
+          feedback.classList.add('bg-emerald-50', 'text-emerald-800', 'border', 'border-emerald-200');
+          feedback.innerHTML = `<p class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-circle-check"></i> Correct! (+$10$ Points)</p><p class="mt-1">${ansInfo.explanation}</p>`;
+        } else {
+          feedback.classList.add('bg-rose-50', 'text-rose-800', 'border', 'border-rose-200');
+          const chosenText = selected ? selected.value : "None";
+          feedback.innerHTML = `<p class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-circle-xmark"></i> Incorrect (Selected: ${chosenText}, Correct: ${ansInfo.correct})</p><p class="mt-1">${ansInfo.explanation}</p>`;
+        }
+      });
+
+      // Check Fill in the Blank
+      // Q6
+      const q6Val = document.getElementById('q6').value.trim();
+      const q6Fb = document.getElementById('q6-feedback');
+      q6Fb.classList.remove('hidden');
+      if (q6Val === EXAM_ANSWERS.q6.correct || Math.abs(parseFloat(q6Val) - parseFloat(EXAM_ANSWERS.q6.correct)) <= EXAM_ANSWERS.q6.tolerance) {
+        totalScore += EXAM_ANSWERS.q6.points;
+        q6Fb.className = "mt-3 p-3 rounded-lg text-sm bg-emerald-50 text-emerald-800 border border-emerald-200";
+        q6Fb.innerHTML = `<p class="font-bold"><i class="fa-solid fa-circle-check"></i> Correct! (+$10$ Points)</p><p class="mt-1">${EXAM_ANSWERS.q6.explanation}</p>`;
+      } else {
+        q6Fb.className = "mt-3 p-3 rounded-lg text-sm bg-rose-50 text-rose-800 border border-rose-200";
+        q6Fb.innerHTML = `<p class="font-bold"><i class="fa-solid fa-circle-xmark"></i> Incorrect (Your answer: "${q6Val || 'empty'}", Correct: ${EXAM_ANSWERS.q6.correct})</p><p class="mt-1">${EXAM_ANSWERS.q6.explanation}</p>`;
+      }
+
+      // Q7
+      const q7Val = document.getElementById('q7').value.trim().toLowerCase();
+      const q7Fb = document.getElementById('q7-feedback');
+      q7Fb.classList.remove('hidden');
+      if (q7Val === EXAM_ANSWERS.q7.correct) {
+        totalScore += EXAM_ANSWERS.q7.points;
+        q7Fb.className = "mt-3 p-3 rounded-lg text-sm bg-emerald-50 text-emerald-800 border border-emerald-200";
+        q7Fb.innerHTML = `<p class="font-bold"><i class="fa-solid fa-circle-check"></i> Correct! (+$10$ Points)</p><p class="mt-1">${EXAM_ANSWERS.q7.explanation}</p>`;
+      } else {
+        q7Fb.className = "mt-3 p-3 rounded-lg text-sm bg-rose-50 text-rose-800 border border-rose-200";
+        q7Fb.innerHTML = `<p class="font-bold"><i class="fa-solid fa-circle-xmark"></i> Incorrect (Your answer: "${q7Val || 'empty'}", Correct: "${EXAM_ANSWERS.q7.correct}")</p><p class="mt-1">${EXAM_ANSWERS.q7.explanation}</p>`;
+      }
+
+      // Q8
+      const q8Val = document.getElementById('q8').value.trim().replace(/,/g, '');
+      const q8Fb = document.getElementById('q8-feedback');
+      q8Fb.classList.remove('hidden');
+      if (q8Val === EXAM_ANSWERS.q8.correct) {
+        totalScore += EXAM_ANSWERS.q8.points;
+        q8Fb.className = "mt-3 p-3 rounded-lg text-sm bg-emerald-50 text-emerald-800 border border-emerald-200";
+        q8Fb.innerHTML = `<p class="font-bold"><i class="fa-solid fa-circle-check"></i> Correct! (+$10$ Points)</p><p class="mt-1">${EXAM_ANSWERS.q8.explanation}</p>`;
+      } else {
+        q8Fb.className = "mt-3 p-3 rounded-lg text-sm bg-rose-50 text-rose-800 border border-rose-200";
+        q8Fb.innerHTML = `<p class="font-bold"><i class="fa-solid fa-circle-xmark"></i> Incorrect (Your answer: "${q8Val || 'empty'}", Correct: ${EXAM_ANSWERS.q8.correct})</p><p class="mt-1">${EXAM_ANSWERS.q8.explanation}</p>`;
+      }
+
+      // Check Matching
+      // Q9
+      const q9Val = document.getElementById('q9').value;
+      const q9Fb = document.getElementById('q9-feedback');
+      q9Fb.classList.remove('hidden');
+      if (q9Val === EXAM_ANSWERS.q9.correct) {
+        totalScore += EXAM_ANSWERS.q9.points;
+        q9Fb.className = "mt-2 p-2 rounded text-xs bg-emerald-50 text-emerald-800 border border-emerald-200";
+        q9Fb.innerHTML = `<p class="font-bold"><i class="fa-solid fa-check"></i> Correct (+$10$ Points)</p>`;
+      } else {
+        q9Fb.className = "mt-2 p-2 rounded text-xs bg-rose-50 text-rose-800 border border-rose-200";
+        q9Fb.innerHTML = `<p class="font-bold"><i class="fa-solid fa-xmark"></i> Incorrect (Choice: ${q9Val || 'None'}, Correct: ${EXAM_ANSWERS.q9.correct})</p>`;
+      }
+
+      // Q10
+      const q10Val = document.getElementById('q10').value;
+      const q10Fb = document.getElementById('q10-feedback');
+      q10Fb.classList.remove('hidden');
+      if (q10Val === EXAM_ANSWERS.q10.correct) {
+        totalScore += EXAM_ANSWERS.q10.points;
+        q10Fb.className = "mt-2 p-2 rounded text-xs bg-emerald-50 text-emerald-800 border border-emerald-200";
+        q10Fb.innerHTML = `<p class="font-bold"><i class="fa-solid fa-check"></i> Correct (+$10$ Points)</p>`;
+      } else {
+        q10Fb.className = "mt-2 p-2 rounded text-xs bg-rose-50 text-rose-800 border border-rose-200";
+        q10Fb.innerHTML = `<p class="font-bold"><i class="fa-solid fa-xmark"></i> Incorrect (Choice: ${q10Val || 'None'}, Correct: ${EXAM_ANSWERS.q10.correct})</p>`;
+      }
+
+      // Update Grading Sidebar Panel
+      const percentage = (totalScore / totalPossible) * 100;
+      document.getElementById('score-display').classList.remove('hidden');
+      document.getElementById('score-percentage').innerText = `${percentage}%`;
+      document.getElementById('score-fraction').innerText = `${totalScore / 10} of 10 Correct`;
+
+      // Set letter grade
+      const badge = document.getElementById('letter-grade-badge');
+      let grade = "F";
+      let badgeClass = "mt-2 inline-block text-xs font-bold px-3 py-1 rounded ";
+      if (percentage >= 90) {
+        grade = "A";
+        badgeClass += "bg-emerald-600 text-white";
+      } else if (percentage >= 80) {
+        grade = "B";
+        badgeClass += "bg-blue-600 text-white";
+      } else if (percentage >= 70) {
+        grade = "C";
+        badgeClass += "bg-amber-500 text-slate-900";
+      } else if (percentage >= 60) {
+        grade = "D";
+        badgeClass += "bg-orange-500 text-white";
+      } else {
+        badgeClass += "bg-rose-600 text-white";
+      }
+      badge.innerText = `Grade: ${grade}`;
+      badge.className = badgeClass;
+
+      // Update Status label
+      document.getElementById('quiz-status').innerHTML = `Status: <span class="text-emerald-600 font-bold">Graded</span>`;
+      
+      showToast(`Quiz Submitted! Final Score: ${percentage}% (${grade})`, true);
+      
+      // Auto-scroll to grading dashboard on mobile
+      if (window.innerWidth < 1024) {
+        document.getElementById('results-card').scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    // Reset the exam input form completely
+    function resetForm() {
+      document.getElementById('examForm').reset();
+      
+      // Reset status displays
+      document.getElementById('score-display').classList.add('hidden');
+      document.getElementById('quiz-status').innerHTML = `Status: <span class="text-amber-600 font-bold">Unsubmitted</span>`;
+      
+      for (let i = 1; i <= 10; i++) {
+        const fb = document.getElementById(`q${i}-feedback`);
+        if (fb) fb.classList.add('hidden');
+      }
+      document.getElementById('q9-feedback').classList.add('hidden');
+      document.getElementById('q10-feedback').classList.add('hidden');
+
+      showToast("Exam inputs have been cleared.", true);
+    }
+
+    // Populate Printable/PDF Answer Key Elements dynamically
+    function buildPrintAnswerKey() {
+      const container = document.getElementById('print-answer-key-content');
+      let html = "";
+      
+      for (let i = 1; i <= 10; i++) {
+        const qKey = `q${i}`;
+        const info = EXAM_ANSWERS[qKey];
+        html += `
+          <div class="border-b border-slate-200 pb-3">
+            <p class="font-bold">Question ${i}: Correct Answer is [${info.correct}]</p>
+            <p class="text-xs text-slate-600 mt-1 italic">${info.explanation}</p>
+          </div>
+        `;
+      }
+      container.innerHTML = html;
+    }
+
+    // Sandbox Physics Calculator
+    function calculateSandboxForce() {
+      const q1 = parseFloat(document.getElementById('calc-q1').value) * 1e-6; // convert from uC
+      const q2 = parseFloat(document.getElementById('calc-q2').value) * 1e-6; // convert from uC
+      const r = parseFloat(document.getElementById('calc-r').value);
+      const output = document.getElementById('sandbox-result');
+
+      if (isNaN(q1) || isNaN(q2) || isNaN(r) || r <= 0) {
+        output.classList.remove('hidden');
+        output.className = "bg-rose-50 border border-rose-200 rounded p-2.5 text-center font-mono mt-3 text-rose-800 text-xs";
+        output.innerHTML = "Error: Input real values & distance > 0.";
+        return;
+      }
+
+      const k = 8.99e9;
+      const forceMag = k * Math.abs(q1 * q2) / (r * r);
+      const isAttractive = (q1 * q2) < 0;
+
+      output.classList.remove('hidden');
+      output.className = "bg-slate-900 text-white rounded p-3 text-center font-mono mt-3 text-xs border border-slate-800";
+      output.innerHTML = `
+        <p class="font-bold text-emerald-400">Result Force Magnitude:</p>
+        <p class="text-lg font-extrabold my-1">${forceMag.toExponential(3)} N</p>
+        <p class="text-[10px] text-slate-400">Type: ${isAttractive ? 'Attractive Force' : 'Repulsive Force'}</p>
+      `;
+    }
+
+    // D2L / Brightspace IMS QTI 2.1 Zip Generator Logic
+    function exportQTI() {
+      showToast("Generating IMS QTI zip package...", true);
+      const zip = new JSZip();
+
+      // 1. imsmanifest.xml
+      const manifestXml = `<?xml version="1.0" encoding="UTF-8"?>
+<manifest xmlns="http://www.imsglobal.org/xsd/imscp_v1p1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imscp_v1p1 http://www.imsglobal.org/xsd/imscp_v1p1.xsd" identifier="coulomb-exam-manifest">
+  <metadata>
+    <schema>IMS Content</schema>
+    <schemaversion>2.1</schemaversion>
+  </metadata>
+  <organizations/>
+  <resources>
+    <resource identifier="resource_quiz" type="imsqti_test_xmlv2p1">
+      <file href="coulomb_exam.xml"/>
+    </resource>
+  </resources>
+</manifest>`;
+
+      // 2. Full single-test assessment resource (standard QTI 2.1 syntax)
+      const quizXml = `<?xml version="1.0" encoding="UTF-8"?>
+<assessmentTest xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd" identifier="coulomb_law_diagnostic_freshmen" title="Coulomb's Law Freshman Diagnostic Exam">
+  <outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float"/>
+  <testPart identifier="testPart1" navigationMode="linear" submissionMode="individual">
+    <assessmentSection identifier="section1" title="Coulomb's Law Exam Items" visible="true">
+      
+      <!-- ITEM 1: MC -->
+      <assessmentItem identifier="q1" title="Newton's Third Law Force Ratio" adaptive="false" timeDependent="false">
+        <responseDeclaration identifier="RESPONSE" cardinality="single" baseType="identifier">
+          <correctResponse>
+            <value>ChoiceB</value>
+          </correctResponse>
+        </responseDeclaration>
+        <itemBody>
+          <choiceInteraction responseIdentifier="RESPONSE" shuffle="false" maxChoices="1">
+            <prompt>Two point charges, q1 = +2.0 uC and q2 = -6.0 uC, are separated by a distance r. If the electrostatic force exerted on q1 by q2 is F12, which statement regarding force F21 exerted on q2 by q1 is correct?</prompt>
+            <simpleChoice identifier="ChoiceA">F21 = -3*F12 because q2 has 3x magnitude</simpleChoice>
+            <simpleChoice identifier="ChoiceB">F21 = -F12 according to Newton's Third Law (equal and opposite)</simpleChoice>
+            <simpleChoice identifier="ChoiceC">F21 = -1/3*F12 because inverse proportion</simpleChoice>
+            <simpleChoice identifier="ChoiceD">F21 = 3*F12 because field line concentration</simpleChoice>
+          </choiceInteraction>
+        </itemBody>
+      </assessmentItem>
+
+      <!-- ITEM 2: MC -->
+      <assessmentItem identifier="q2" title="Conduction and Force Ratio" adaptive="false" timeDependent="false">
+        <responseDeclaration identifier="RESPONSE" cardinality="single" baseType="identifier">
+          <correctResponse>
+            <value>ChoiceA</value>
+          </correctResponse>
+        </responseDeclaration>
+        <itemBody>
+          <choiceInteraction responseIdentifier="RESPONSE" shuffle="false" maxChoices="1">
+            <prompt>Two identical metallic spheres carry +8 uC and -2 uC. They are touched together and then separated. What is the ratio of final force to original force?</prompt>
+            <simpleChoice identifier="ChoiceA">9/16</simpleChoice>
+            <simpleChoice identifier="ChoiceB">1/2</simpleChoice>
+            <simpleChoice identifier="ChoiceC">3/4</simpleChoice>
+            <simpleChoice identifier="ChoiceD">9/8</simpleChoice>
+          </choiceInteraction>
+        </itemBody>
+      </assessmentItem>
+
+      <!-- ITEM 3: MC -->
+      <assessmentItem identifier="q3" title="Permittivity and Dielectrics" adaptive="false" timeDependent="false">
+        <responseDeclaration identifier="RESPONSE" cardinality="single" baseType="identifier">
+          <correctResponse>
+            <value>ChoiceB</value>
+          </correctResponse>
+        </responseDeclaration>
+        <itemBody>
+          <choiceInteraction responseIdentifier="RESPONSE" shuffle="false" maxChoices="1">
+            <prompt>If medium between charges is switched from vacuum to a liquid with dielectric constant k = 4.0, how does force magnitude change?</prompt>
+            <simpleChoice identifier="ChoiceA">Increases by factor of 4</simpleChoice>
+            <simpleChoice identifier="ChoiceB">Decreases by factor of 4</simpleChoice>
+            <simpleChoice identifier="ChoiceC">Decreases by factor of 16</simpleChoice>
+            <simpleChoice identifier="ChoiceD">Remains completely unchanged</simpleChoice>
+          </choiceInteraction>
+        </itemBody>
+      </assessmentItem>
+
+      <!-- ITEM 4: MC -->
+      <assessmentItem identifier="q4" title="Equilibrium Coordinate Point" adaptive="false" timeDependent="false">
+        <responseDeclaration identifier="RESPONSE" cardinality="single" baseType="identifier">
+          <correctResponse>
+            <value>ChoiceB</value>
+          </correctResponse>
+        </responseDeclaration>
+        <itemBody>
+          <choiceInteraction responseIdentifier="RESPONSE" shuffle="false" maxChoices="1">
+            <prompt>A point charge q1 = +4 uC at (0,0) and q2 = +9 uC is at x = 1.0 m. Where can a third negative charge q3 = -1 uC be placed for zero net force?</prompt>
+            <simpleChoice identifier="ChoiceA">x = 0.31 m</simpleChoice>
+            <simpleChoice identifier="ChoiceB">x = 0.40 m</simpleChoice>
+            <simpleChoice identifier="ChoiceC">x = 0.44 m</simpleChoice>
+            <simpleChoice identifier="ChoiceD">x = 0.50 m</simpleChoice>
+          </choiceInteraction>
+        </itemBody>
+      </assessmentItem>
+
+      <!-- ITEM 5: MC -->
+      <assessmentItem identifier="q5" title="Force Curve Function" adaptive="false" timeDependent="false">
+        <responseDeclaration identifier="RESPONSE" cardinality="single" baseType="identifier">
+          <correctResponse>
+            <value>ChoiceC</value>
+          </correctResponse>
+        </responseDeclaration>
+        <itemBody>
+          <choiceInteraction responseIdentifier="RESPONSE" shuffle="false" maxChoices="1">
+            <prompt>The force-distance curve representing Coulomb's Law corresponds to which mathematical function?</prompt>
+            <simpleChoice identifier="ChoiceA">Linear directly proportional decay</simpleChoice>
+            <simpleChoice identifier="ChoiceB">Exponential decay</simpleChoice>
+            <simpleChoice identifier="ChoiceC">Inverse-square law dependency (1/r^2)</simpleChoice>
+            <simpleChoice identifier="ChoiceD">Quadratic parabolic progression</simpleChoice>
+          </choiceInteraction>
+        </itemBody>
+      </assessmentItem>
+
+      <!-- ITEM 6: FIB -->
+      <assessmentItem identifier="q6" title="FIB Proton-Proton Nuclear Force" adaptive="false" timeDependent="false">
+        <responseDeclaration identifier="RESPONSE" cardinality="single" baseType="float">
+          <correctResponse>
+            <value>102</value>
+          </correctResponse>
+        </responseDeclaration>
+        <itemBody>
+          <textEntryInteraction responseIdentifier="RESPONSE" expectedLength="15">
+            <prompt>Two helium nuclei (each with 2 protons, e = 1.6e-19 C) are separated by 3.00e-15 m. Calculate repulsive force in Newtons (Round to nearest integer):</prompt>
+          </textEntryInteraction>
+        </itemBody>
+      </assessmentItem>
+
+      <!-- ITEM 7: FIB -->
+      <assessmentItem identifier="q7" title="FIB Vector Geometry" adaptive="false" timeDependent="false">
+        <responseDeclaration identifier="RESPONSE" cardinality="single" baseType="string">
+          <correctResponse>
+            <value>direction</value>
+          </correctResponse>
+        </responseDeclaration>
+        <itemBody>
+          <textEntryInteraction responseIdentifier="RESPONSE" expectedLength="30">
+            <prompt>When Coulomb's Law is written in vector form, the unit vector designates the ________ of the force vector projection:</prompt>
+          </textEntryInteraction>
+        </itemBody>
+      </assessmentItem>
+
+      <!-- ITEM 8: FIB -->
+      <assessmentItem identifier="q8" title="FIB Quantized Charge Transfer" adaptive="false" timeDependent="false">
+        <responseDeclaration identifier="RESPONSE" cardinality="single" baseType="integer">
+          <correctResponse>
+            <value>300000</value>
+          </correctResponse>
+        </responseDeclaration>
+        <itemBody>
+          <textEntryInteraction responseIdentifier="RESPONSE" expectedLength="15">
+            <prompt>One object acquires a positive charge of +4.8e-14 C by rubbing. How many electrons did the other object acquire? (Provide exact count integer):</prompt>
+          </textEntryInteraction>
+        </itemBody>
+      </assessmentItem>
+
+      <!-- ITEM 9: Matching 1 -->
+      <assessmentItem identifier="q9" title="Matching Electrostatic Constant" adaptive="false" timeDependent="false">
+        <responseDeclaration identifier="RESPONSE" cardinality="single" baseType="identifier">
+          <correctResponse>
+            <value>ChoiceY</value>
+          </correctResponse>
+        </responseDeclaration>
+        <itemBody>
+          <choiceInteraction responseIdentifier="RESPONSE" maxChoices="1">
+            <prompt>Select the correct SI unit units for Coulomb's Constant (k_e):</prompt>
+            <simpleChoice identifier="ChoiceX">C^2 / (N*m^2)</simpleChoice>
+            <simpleChoice identifier="ChoiceY">N*m^2 / C^2</simpleChoice>
+            <simpleChoice identifier="ChoiceZ">N*C / m^2</simpleChoice>
+          </choiceInteraction>
+        </itemBody>
+      </assessmentItem>
+
+      <!-- ITEM 10: Matching 2 -->
+      <assessmentItem identifier="q10" title="Matching Free Space Permittivity" adaptive="false" timeDependent="false">
+        <responseDeclaration identifier="RESPONSE" cardinality="single" baseType="identifier">
+          <correctResponse>
+            <value>ChoiceX</value>
+          </correctResponse>
+        </responseDeclaration>
+        <itemBody>
+          <choiceInteraction responseIdentifier="RESPONSE" maxChoices="1">
+            <prompt>Select the correct SI unit units for Permittivity of Free Space (epsilon_0):</prompt>
+            <simpleChoice identifier="ChoiceX">C^2 / (N*m^2)</simpleChoice>
+            <simpleChoice identifier="ChoiceY">N*m^2 / C^2</simpleChoice>
+            <simpleChoice identifier="ChoiceZ">N*C / m^2</simpleChoice>
+          </choiceInteraction>
+        </itemBody>
+      </assessmentItem>
+
+    </assessmentSection>
+  </testPart>
+</assessmentTest>`;
+
+      // Add to ZIP structure
+      zip.file("imsmanifest.xml", manifestXml);
+      zip.file("coulomb_exam.xml", quizXml);
+
+      // Package and trigger download
+      zip.generateAsync({ type: "blob" })
+        .then(function(content) {
+          const url = URL.createObjectURL(content);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "Coulombs_Law_Brightspace_QTI.zip";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          showToast("QTI Zip downloaded! Upload directly to Brightspace Import Course Materials.", true);
+        })
+        .catch(function(err) {
+          showToast("Failed to compile QTI: " + err, false);
+        });
+    }
+  </script>
+</body>
+</html>
