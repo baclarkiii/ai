@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physics Lesson Prompt Generator</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        physics: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome for beautiful scientific & app icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 min-h-screen font-sans transition-colors duration-200">
+
+    <!-- TOP HEADER BAR -->
+    <header class="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur border-b border-slate-200 dark:border-slate-800 px-4 py-3 sm:px-6 shadow-sm">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            
+            <!-- Logo & Title -->
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-physics-600 text-white rounded-lg shadow-md shadow-physics-600/20">
+                    <i class="fa-solid fa-atom text-xl animate-spin-slow"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
+                        PhysPrompt <span class="text-xs font-semibold px-2 py-0.5 rounded bg-physics-100 text-physics-800 dark:bg-physics-900 dark:text-physics-300">v2.0</span>
+                    </h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Interactive Lesson Generator & Laboratory Sandbox</p>
+                </div>
+            </div>
+
+            <!-- Quick Controls: Theme, Navigation Dropdown & Presets -->
+            <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-end">
+                
+                <!-- Quick Dropdown Navigation -->
+                <div class="relative inline-block text-left">
+                    <select id="quick-nav" onchange="scrollToSection(this.value)" class="block w-full rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-200 shadow-sm focus:border-physics-500 focus:outline-none focus:ring-1 focus:ring-physics-500">
+                        <option value="">-- Scroll to Section --</option>
+                        <option value="section-preset">1. Curricular Presets</option>
+                        <option value="section-metadata">2. Lesson Metadata</option>
+                        <option value="section-inclusions">3. Module Configurations</option>
+                        <option value="section-sandbox">4. Physics Simulator</option>
+                        <option value="section-output">5. Generated Prompt Output</option>
+                    </select>
+                </div>
+
+                <!-- Course Presets Selector -->
+                <div class="relative inline-block text-left">
+                    <select id="preset-selector" onchange="loadPreset(this.value)" class="block w-full rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-semibold text-physics-700 dark:text-physics-300 shadow-sm focus:border-physics-500 focus:outline-none focus:ring-1 focus:ring-physics-500">
+                        <option value="kinematics">Preset: Kinematics (2D)</option>
+                        <option value="thermodynamics">Preset: Thermodynamics</option>
+                        <option value="electromagnetism">Preset: Electromagnetism</option>
+                        <option value="optics">Preset: Wave Optics</option>
+                        <option value="quantum">Preset: Quantum Mechanics Basics</option>
+                    </select>
+                </div>
+
+                <!-- Theme Toggle Button -->
+                <button onclick="toggleDarkMode()" class="p-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400" title="Toggle Theme">
+                    <i id="theme-icon" class="fa-solid fa-moon text-lg"></i>
+                </button>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENT WRAPPER -->
+    <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- LEFT NAVIGATION SIDEBAR (HIDDEN ON MOBILE) -->
+            <aside class="hidden lg:block lg:col-span-3 sticky top-24 self-start space-y-4">
+                <nav class="space-y-1 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700/50">
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3 px-2">Navigation</p>
+                    
+                    <a href="#section-preset" class="nav-link flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition">
+                        <i class="fa-solid fa-sliders text-physics-600"></i>
+                        <span>1. Curricular Presets</span>
+                    </a>
+                    
+                    <a href="#section-metadata" class="nav-link flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition">
+                        <i class="fa-solid fa-circle-info text-physics-600"></i>
+                        <span>2. Lesson Metadata</span>
+                    </a>
+                    
+                    <a href="#section-inclusions" class="nav-link flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition">
+                        <i class="fa-solid fa-list-check text-physics-600"></i>
+                        <span>3. Module Configurations</span>
+                    </a>
+                    
+                    <a href="#section-sandbox" class="nav-link flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition">
+                        <i class="fa-solid fa-person-running text-physics-600"></i>
+                        <span>4. Physics Simulator</span>
+                    </a>
+                    
+                    <a href="#section-output" class="nav-link flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition">
+                        <i class="fa-solid fa-file-export text-physics-600"></i>
+                        <span>5. Prompt Output</span>
+                    </a>
+                </nav>
+
+                <!-- Helpful Tip Card -->
+                <div class="bg-gradient-to-br from-physics-50 to-sky-100 dark:from-slate-800 dark:to-slate-800/50 p-4 rounded-xl border border-physics-100 dark:border-slate-700">
+                    <h3 class="text-xs font-bold text-physics-800 dark:text-physics-300 uppercase tracking-wide flex items-center gap-1.5 mb-1">
+                        <i class="fa-solid fa-lightbulb"></i> Pro-Tip
+                    </h3>
+                    <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                        Play with the <strong>Physics Simulator</strong> below! You can launch projectiles and immediately inject your configured experimental gravity, launch speed, and angle into your generated lesson prompt.
+                    </p>
+                </div>
+            </aside>
+
+            <!-- MAIN WORKSPACE -->
+            <main class="lg:col-span-9 space-y-8">
+                
+                <!-- SECTION 1: CURRICULAR PRESETS -->
+                <section id="section-preset" class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700/50 scroll-mt-20">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="p-2 bg-physics-100 dark:bg-physics-900/50 text-physics-600 rounded-lg">
+                            <i class="fa-solid fa-sliders text-lg"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-900 dark:text-white">1. Choose a Curricular Preset</h2>
+                            <p class="text-sm text-slate-500 dark:text-slate-400">Instantly populate fields with curated, high-impact physics modules</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                        <button onclick="loadPreset('kinematics')" class="preset-btn px-3 py-2.5 rounded-lg border text-xs font-semibold text-center hover:shadow-sm transition bg-physics-50 dark:bg-physics-950/20 border-physics-300 dark:border-physics-800 text-physics-700 dark:text-physics-300">
+                            <i class="fa-solid fa-person-running block text-base mb-1"></i>
+                            2D Kinematics
+                        </button>
+                        <button onclick="loadPreset('thermodynamics')" class="preset-btn px-3 py-2.5 rounded-lg border text-xs font-semibold text-center hover:shadow-sm transition bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-physics-400 dark:hover:border-physics-500 text-slate-700 dark:text-slate-300">
+                            <i class="fa-solid fa-fire block text-base mb-1"></i>
+                            Thermodynamics
+                        </button>
+                        <button onclick="loadPreset('electromagnetism')" class="preset-btn px-3 py-2.5 rounded-lg border text-xs font-semibold text-center hover:shadow-sm transition bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-physics-400 dark:hover:border-physics-500 text-slate-700 dark:text-slate-300">
+                            <i class="fa-solid fa-bolt block text-base mb-1"></i>
+                            Electromagnetism
+                        </button>
+                        <button onclick="loadPreset('optics')" class="preset-btn px-3 py-2.5 rounded-lg border text-xs font-semibold text-center hover:shadow-sm transition bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-physics-400 dark:hover:border-physics-500 text-slate-700 dark:text-slate-300">
+                            <i class="fa-solid fa-wave-square block text-base mb-1"></i>
+                            Wave Optics
+                        </button>
+                        <button onclick="loadPreset('quantum')" class="preset-btn col-span-2 md:col-span-1 px-3 py-2.5 rounded-lg border text-xs font-semibold text-center hover:shadow-sm transition bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-physics-400 dark:hover:border-physics-500 text-slate-700 dark:text-slate-300">
+                            <i class="fa-solid fa-microscope block text-base mb-1"></i>
+                            Quantum Basics
+                        </button>
+                    </div>
+                </section>
+
+                <!-- SECTION 2: LESSON METADATA -->
+                <section id="section-metadata" class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700/50 scroll-mt-20">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="p-2 bg-physics-100 dark:bg-physics-900/50 text-physics-600 rounded-lg">
+                            <i class="fa-solid fa-circle-info text-lg"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-900 dark:text-white">2. Core Lesson Parameters</h2>
+                            <p class="text-sm text-slate-500 dark:text-slate-400">Specify fundamental instructional parameters</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Lesson Title -->
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Lesson Title</label>
+                            <input type="text" id="lesson-title" oninput="updatePrompt()" placeholder="e.g., Classical Projectile Motion & Parabolic Trajectories" class="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2.5 text-sm text-slate-900 dark:text-white focus:border-physics-500 focus:outline-none focus:ring-1 focus:ring-physics-500">
+                        </div>
+
+                        <!-- Lesson Subject -->
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Subject / Theme</label>
+                            <input type="text" id="lesson-subject" oninput="updatePrompt()" placeholder="e.g., Classical Mechanics, Kinematics, Newtonian Physics" class="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2.5 text-sm text-slate-900 dark:text-white focus:border-physics-500 focus:outline-none focus:ring-1 focus:ring-physics-500">
+                        </div>
+
+                        <!-- Target Grade Level -->
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Target Academic Level</label>
+                            <select id="lesson-level" onchange="updatePrompt()" class="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2.5 text-sm text-slate-900 dark:text-white focus:border-physics-500 focus:outline-none focus:ring-1 focus:ring-physics-500">
+                                <option value="Middle School Physical Science">Middle School (Grades 6-8)</option>
+                                <option value="High School Physics (Conceptual)">High School Conceptual Physics</option>
+                                <option value="High School AP/IB Physics" selected>High School AP/IB Physics (Algebra/Calculus-based)</option>
+                                <option value="Undergraduate Introductory Physics">Undergraduate Introductory Physics</option>
+                                <option value="Advanced Modern Physics">Advanced Undergraduate Physics</option>
+                            </select>
+                        </div>
+
+                        <!-- Target Class Duration -->
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Allocated Duration</label>
+                            <input type="text" id="lesson-duration" oninput="updatePrompt()" placeholder="e.g., 60 minutes, 2 class periods" value="60 minutes" class="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2.5 text-sm text-slate-900 dark:text-white focus:border-physics-500 focus:outline-none focus:ring-1 focus:ring-physics-500">
+                        </div>
+
+                        <!-- Learning Objectives -->
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Learning Objectives (One per line)</label>
+                            <textarea id="lesson-objectives" oninput="updatePrompt()" rows="3" placeholder="e.g., Calculate projectile vectors... Solve range, flight time, and maximum height variables..." class="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2.5 text-sm text-slate-900 dark:text-white focus:border-physics-500 focus:outline-none focus:ring-1 focus:ring-physics-500"></textarea>
+                        </div>
+
+                        <!-- Key Concepts -->
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Key Core Concepts to Explode/Deep-Dive</label>
+                            <input type="text" id="lesson-concepts" oninput="updatePrompt()" placeholder="e.g., Independence of x and y axes, Gravitational constant, Launch speed, Kinetic and Potential energy exchange" class="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2.5 text-sm text-slate-900 dark:text-white focus:border-physics-500 focus:outline-none focus:ring-1 focus:ring-physics-500">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 3: INCLUSION CONFIGURATION -->
+                <section id="section-inclusions" class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700/50 scroll-mt-20">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="p-2 bg-physics-100 dark:bg-physics-900/50 text-physics-600 rounded-lg">
+                            <i class="fa-solid fa-list-check text-lg"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-900 dark:text-white">3. Prompt Modules & Lesson Flow</h2>
+                            <p class="text-sm text-slate-500 dark:text-slate-400">Toggle segments to automatically inject structured pedagogical sections</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Module Toggle Wrapper -->
+                        <div class="flex items-start p-3 rounded-lg border border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/30">
+                            <input type="checkbox" id="inc-pretest" onchange="updatePrompt()" checked class="mt-1 h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-physics-600 focus:ring-physics-500">
+                            <div class="ml-3">
+                                <label for="inc-pretest" class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                                    <i class="fa-solid fa-list-ol text-physics-600 text-xs"></i> Pre-Test Section
+                                </label>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">Includes 3 baseline diagnostic questions mapping to misconception diagnostics.</p>
+                            </div>
+                        </div>
+
+                        <!-- Module Toggle Wrapper -->
+                        <div class="flex items-start p-3 rounded-lg border border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/30">
+                            <input type="checkbox" id="inc-terms" onchange="updatePrompt()" checked class="mt-1 h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-physics-600 focus:ring-physics-500">
+                            <div class="ml-3">
+                                <label for="inc-terms" class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                                    <i class="fa-solid fa-book-atlas text-physics-600 text-xs"></i> Key Vocabulary Terms
+                                </label>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">Adds clear vocabulary tables with definitions, units, and symbols (e.g., $g$, $v_x$).</p>
+                            </div>
+                        </div>
+
+                        <!-- Module Toggle Wrapper -->
+                        <div class="flex items-start p-3 rounded-lg border border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/30">
+                            <input type="checkbox" id="inc-content" onchange="updatePrompt()" checked class="mt-1 h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-physics-600 focus:ring-physics-500">
+                            <div class="ml-3">
+                                <label for="inc-content" class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                                    <i class="fa-solid fa-paragraph text-physics-600 text-xs"></i> Comprehensive Subject Matter Content
+                                </label>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">Demands deep math derivations, physical formulas, and complete proofs.</p>
+                            </div>
+                        </div>
+
+                        <!-- Module Toggle Wrapper -->
+                        <div class="flex items-start p-3 rounded-lg border border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/30">
+                            <input type="checkbox" id="inc-examples" onchange="updatePrompt()" checked class="mt-1 h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-physics-600 focus:ring-physics-500">
+                            <div class="ml-3">
+                                <label for="inc-examples" class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                                    <i class="fa-solid fa-circle-nodes text-physics-600 text-xs"></i> Worked Real-World Examples
+                                </label>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">Step-by-step mathematical guides detailing real-world occurrences.</p>
+                            </div>
+                        </div>
+
+                        <!-- Module Toggle Wrapper -->
+                        <div class="flex items-start p-3 rounded-lg border border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/30">
+                            <input type="checkbox" id="inc-quiz" onchange="updatePrompt()" checked class="mt-1 h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-physics-600 focus:ring-physics-500">
+                            <div class="ml-3">
+                                <label for="inc-quiz" class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                                    <i class="fa-solid fa-circle-question text-physics-600 text-xs"></i> Interactive/Formative Quizzes
+                                </label>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">Generates 5 conceptual and calculations-based problems with explanations.</p>
+                            </div>
+                        </div>
+
+                        <!-- Module Toggle Wrapper -->
+                        <div class="flex items-start p-3 rounded-lg border border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/30">
+                            <input type="checkbox" id="inc-summary" onchange="updatePrompt()" checked class="mt-1 h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-physics-600 focus:ring-physics-500">
+                            <div class="ml-3">
+                                <label for="inc-summary" class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                                    <i class="fa-solid fa-clipboard-list text-physics-600 text-xs"></i> Core Mathematical Summary
+                                </label>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">A concise, formula-rich cheatsheet block summarizing key takeaways.</p>
+                            </div>
+                        </div>
+
+                        <!-- Module Toggle Wrapper -->
+                        <div class="flex items-start p-3 rounded-lg border border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/30">
+                            <input type="checkbox" id="inc-posttest" onchange="updatePrompt()" checked class="mt-1 h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-physics-600 focus:ring-physics-500">
+                            <div class="ml-3">
+                                <label for="inc-posttest" class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                                    <i class="fa-solid fa-graduation-cap text-physics-600 text-xs"></i> Post-Test Evaluation
+                                </label>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">Summative assessment featuring 5 tiered, complex, calculus-optional problems.</p>
+                            </div>
+                        </div>
+
+                        <!-- Module Toggle Wrapper -->
+                        <div class="flex items-start p-3 rounded-lg border border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/30">
+                            <input type="checkbox" id="inc-ada" onchange="updatePrompt()" checked class="mt-1 h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-physics-600 focus:ring-physics-500">
+                            <div class="ml-3">
+                                <label for="inc-ada" class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                                    <i class="fa-solid fa-universal-access text-physics-600 text-xs"></i> Complete ADA Accessibility Checklist
+                                </label>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">Provides alt-text directives, screen-reader markup guides, and cognitive modifications.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 4: INTERACTIVE PHYSICS SANDBOX -->
+                <section id="section-sandbox" class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700/50 scroll-mt-20">
+                    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 bg-physics-100 dark:bg-physics-900/50 text-physics-600 rounded-lg">
+                                <i class="fa-solid fa-circle-play text-lg"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-lg font-bold text-slate-900 dark:text-white">4. Interactive Demonstration Sandbox</h2>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">Visual projectile calculator. Click 'Incorporate Data' to push simulator metrics to your final prompt.</p>
+                            </div>
+                        </div>
+                        <button onclick="injectSandboxData()" class="text-xs font-bold px-3 py-1.5 rounded bg-physics-600 text-white hover:bg-physics-700 shadow flex items-center gap-1.5 transition">
+                            <i class="fa-solid fa-circle-down"></i> Incorporate Demo Data
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700/50">
+                        
+                        <!-- SIMULATION CANVAS -->
+                        <div class="lg:col-span-2 flex flex-col gap-2">
+                            <div class="relative bg-slate-950 rounded-lg overflow-hidden border border-slate-800 shadow-inner" style="height: 300px;">
+                                <canvas id="sim-canvas" class="w-full h-full block"></canvas>
+                                <!-- Floating readout -->
+                                <div class="absolute top-3 left-3 bg-slate-900/80 border border-slate-700/50 backdrop-blur rounded p-2 text-[10px] text-slate-300 space-y-0.5 pointer-events-none">
+                                    <div>Max Height: <span id="out-height" class="font-mono text-physics-400">0.0</span> m</div>
+                                    <div>Total Range: <span id="out-range" class="font-mono text-physics-400">0.0</span> m</div>
+                                    <div>Flight Time: <span id="out-time" class="font-mono text-physics-400">0.0</span> s</div>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center px-1">
+                                <div class="text-[10px] text-slate-400">Grid unit: 10 pixels = 1 meter</div>
+                                <div class="flex gap-2">
+                                    <button onclick="fireProjectile()" class="px-3 py-1 bg-physics-600 hover:bg-physics-700 text-white rounded text-xs font-bold flex items-center gap-1">
+                                        <i class="fa-solid fa-bullseye"></i> Launch
+                                    </button>
+                                    <button onclick="clearSimulation()" class="px-3 py-1 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 rounded text-xs font-bold">
+                                        Clear
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SLIDERS & PARAMETERS -->
+                        <div class="flex flex-col justify-between space-y-4">
+                            <!-- Slider 1 -->
+                            <div>
+                                <div class="flex justify-between text-xs font-semibold text-slate-500 mb-1">
+                                    <span>Launch Velocity ($v_0$)</span>
+                                    <span class="font-mono text-physics-600 dark:text-physics-400" id="val-speed">25 m/s</span>
+                                </div>
+                                <input type="range" id="param-speed" min="5" max="50" value="25" oninput="updateSliders()" class="w-full accent-physics-600">
+                            </div>
+
+                            <!-- Slider 2 -->
+                            <div>
+                                <div class="flex justify-between text-xs font-semibold text-slate-500 mb-1">
+                                    <span>Launch Angle ($\theta$)</span>
+                                    <span class="font-mono text-physics-600 dark:text-physics-400" id="val-angle">45°</span>
+                                </div>
+                                <input type="range" id="param-angle" min="10" max="90" value="45" oninput="updateSliders()" class="w-full accent-physics-600">
+                            </div>
+
+                            <!-- Slider 3 -->
+                            <div>
+                                <div class="flex justify-between text-xs font-semibold text-slate-500 mb-1">
+                                    <span>Acceleration ($g$)</span>
+                                    <span class="font-mono text-physics-600 dark:text-physics-400" id="val-gravity">9.81 m/s²</span>
+                                </div>
+                                <input type="range" id="param-gravity" min="1" max="25" step="0.1" value="9.8" oninput="updateSliders()" class="w-full accent-physics-600">
+                            </div>
+
+                            <!-- Environmental quick presets -->
+                            <div class="pt-2 border-t border-slate-200 dark:border-slate-800">
+                                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Preset Gravities</label>
+                                <div class="grid grid-cols-3 gap-1">
+                                    <button onclick="setGravityPreset(3.7)" class="text-[10px] py-1 bg-white dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700">Mars (3.7)</button>
+                                    <button onclick="setGravityPreset(9.81)" class="text-[10px] py-1 bg-white dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700">Earth (9.8)</button>
+                                    <button onclick="setGravityPreset(24.79)" class="text-[10px] py-1 bg-white dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700">Jupiter (24.8)</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- SECTION 5: FINAL OUTPUT -->
+                <section id="section-output" class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700/50 scroll-mt-20">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 bg-physics-100 dark:bg-physics-900/50 text-physics-600 rounded-lg">
+                                <i class="fa-solid fa-file-export text-lg"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-lg font-bold text-slate-900 dark:text-white">5. AI Lesson Plan Prompt</h2>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">Copy this customized engineering template prompt to feed into Gemini or other LLMs.</p>
+                            </div>
+                        </div>
+                        <button onclick="copyToClipboard()" class="w-full sm:w-auto px-4 py-2 bg-physics-600 hover:bg-physics-700 text-white rounded-lg shadow font-semibold text-sm flex items-center justify-center gap-2 transition active:scale-95">
+                            <i class="fa-regular fa-copy"></i>
+                            <span id="copy-text">Copy Prompt</span>
+                        </button>
+                    </div>
+
+                    <!-- PROMPT OUTPUT TEXTAREA -->
+                    <div class="relative">
+                        <textarea id="prompt-output" readonly class="w-full h-[450px] font-mono text-xs p-4 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-physics-500 leading-relaxed"></textarea>
+                        
+                        <!-- Mini Alert Modal (Copied Success Indicator) -->
+                        <div id="toast-notif" class="hidden absolute top-4 right-4 bg-emerald-600 text-white px-3 py-1.5 rounded-md shadow-lg text-xs font-semibold flex items-center gap-1.5 transition">
+                            <i class="fa-solid fa-circle-check"></i> Prompt Copied Successfully!
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="mt-20 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 py-8 text-center text-xs text-slate-500 dark:text-slate-400">
+        <div class="max-w-7xl mx-auto px-4 space-y-2">
+            <p class="font-semibold flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-atom text-physics-600"></i> PhysPrompt Lesson Creator Tool
+            </p>
+            <p>Perfect for feeding directly into Gemini to generate robust, ADA-compliant physics courses.</p>
+        </div>
+    </footer>
+
+    <!-- INTERACTIVE JAVASCRIPT LOGIC -->
+    <script>
+        // Set dark mode automatically based on user media preferences or fallback
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+            document.getElementById('theme-icon').className = 'fa-solid fa-sun text-lg text-amber-400';
+        }
+
+        // Toggle Theme
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const themeIcon = document.getElementById('theme-icon');
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                themeIcon.className = 'fa-solid fa-moon text-lg text-slate-500';
+            } else {
+                html.classList.add('dark');
+                themeIcon.className = 'fa-solid fa-sun text-lg text-amber-400';
+            }
+        }
+
+        // Fast Scroll
+        function scrollToSection(id) {
+            if (!id) return;
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // PRESET DATA ENGINE
+        const presets = {
+            kinematics: {
+                title: "2D Classical Projectile Motion & Parabolic Trajectories",
+                subject: "Kinematics, Vector Resolution, Physics Laboratory",
+                level: "High School AP/IB Physics",
+                duration: "60 minutes",
+                objectives: "Resolve velocity vectors into orthogonal component velocities.\nCalculate displacement vectors ($x(t)$ and $y(t)$) over elapsed time.\nDerive horizontal launch distance equations neglecting air drag resistance.\nValidate real-world launches from simulated trajectories using formulas.",
+                concepts: "Independence of vertical and horizontal trajectories, Parabolic arcs, Inertial components, Constant gravitational velocity offsets ($g = 9.8$ m/s²)"
+            },
+            thermodynamics: {
+                title: "First Law of Thermodynamics & Ideal Gas Processes",
+                subject: "Classical Thermodynamics, Kinetic Theory of Gases",
+                level: "Undergraduate Introductory Physics",
+                duration: "90 minutes",
+                objectives: "Apply the conservation of energy equation ($\Delta U = Q - W$) to closed thermodynamic environments.\nIdentify and map isometric, isobaric, isothermal, and adiabatic systems on a standard Pressure-Volume (P-V) plot.\nDetermine heat output vectors and total work integrals during continuous cycles.",
+                concepts: "Internal energy changes, Thermodynamic work formulas ($W = \int P \, dV$), Heat transfer, Thermal equilibrium, Ideal gas constants"
+            },
+            electromagnetism: {
+                title: "Faraday's Law of Induction & Lenz's Law",
+                subject: "Electromagnetism, Magnetic Fields & Electromagnetic Flux",
+                level: "High School AP/IB Physics",
+                duration: "1 class period (45 minutes)",
+                objectives: "Quantify electromagnetic magnetic flux ($\Phi_B = \vec{B} \cdot \vec{A}$).\nDerive electromotive force ($\mathcal{E}$) induced inside standard coils using Faraday's Law.\nMap physical directions of current vectors dictated by Lenz's Law conservation of energy rules.",
+                concepts: "Magnetic field dynamics, Changing flux loops, Induced emf, Conservation of charge and energy vectors, Solenoids"
+            },
+            optics: {
+                title: "Double-Slit Interference & Wave-Particle Duality",
+                subject: "Wave Optics, Diffraction, Wave Interference",
+                level: "High School AP/IB Physics",
+                duration: "75 minutes",
+                objectives: "Derive bright and dark fringes on high-contrast screen sensors using Young's Double-Slit model ($d \sin\theta = m\lambda$).\nCalculate fringe spacing and wavelength relationships in vacuum systems.\nDiscuss structural limitations of particle mechanics when evaluating optical rays.",
+                concepts: "Superposition principle, Coherent wave emissions, Destructive and constructive interference, Path-difference calculations, Wave behaviors"
+            },
+            quantum: {
+                title: "Introduction to Quantum Tunnelling & Wave Functions",
+                subject: "Quantum Physics, Modern Atomic Theory",
+                level: "Advanced Modern Physics",
+                duration: "120 minutes",
+                objectives: "Formulate the standard Schrödinger time-independent wave equation for zero-potential spaces.\nMap transmission probability curves across rectangular potentials.\nExplain real-world quantum phenomena like stellar fusion mechanics.",
+                concepts: "Probability densities, Wave functions ($\Psi$), Quantum barrier heights, Probability waves, Uncertainty principles"
+            }
+        };
+
+        // Load Preset
+        function loadPreset(key) {
+            const preset = presets[key];
+            if (!preset) return;
+
+            document.getElementById('lesson-title').value = preset.title;
+            document.getElementById('lesson-subject').value = preset.subject;
+            document.getElementById('lesson-level').value = preset.level;
+            document.getElementById('lesson-duration').value = preset.duration;
+            document.getElementById('lesson-objectives').value = preset.objectives;
+            document.getElementById('lesson-concepts').value = preset.concepts;
+
+            // Update Preset active styling
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.className = "preset-btn px-3 py-2.5 rounded-lg border text-xs font-semibold text-center hover:shadow-sm transition bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-physics-400 dark:hover:border-physics-500 text-slate-700 dark:text-slate-300";
+            });
+
+            // Highlight chosen preset selector too if matched
+            document.getElementById('preset-selector').value = key;
+
+            updatePrompt();
+        }
+
+        // SANDBOX DATA INJECTION STAMP
+        let customSandboxNotes = "";
+        function injectSandboxData() {
+            const v0 = document.getElementById('param-speed').value;
+            const theta = document.getElementById('param-angle').value;
+            const g = document.getElementById('param-gravity').value;
+
+            // Calculated parameters
+            const thetaRad = (theta * Math.PI) / 180;
+            const hMax = (v0 * v0 * Math.sin(thetaRad) * Math.sin(thetaRad)) / (2 * g);
+            const rRange = (v0 * v0 * Math.sin(2 * thetaRad)) / g;
+            const tFlight = (2 * v0 * Math.sin(thetaRad)) / g;
+
+            customSandboxNotes = `
+- **Laboratory Interactive Physics Simulator Parameters**:
+  * Initial Launch Velocity ($v_0$): ${v0} m/s
+  * Launch Elevation Angle ($\theta$): ${theta}°
+  * Acceleration due to Gravity ($g$): ${g} m/s²
+  * Calculated Maximum Trajectory Height ($H_{max}$): ${hMax.toFixed(2)} m
+  * Calculated Flight Horizontal Distance Range ($R$): ${rRange.toFixed(2)} m
+  * Calculated Total Flight Time Duration ($t$): ${tFlight.toFixed(2)} s
+Please map at least one analytical laboratory question directly targeting these physics inputs. Instructions should ask student to verify mathematical output with these precise simulation settings!`;
+
+            updatePrompt();
+            
+            // Show toast success indicator
+            const toast = document.getElementById('toast-notif');
+            toast.textContent = "Data Injected to Prompt!";
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 2000);
+        }
+
+        // UPDATE PROMPT TEXT AREA
+        function updatePrompt() {
+            const title = document.getElementById('lesson-title').value || "[Lesson Title Not Provided]";
+            const subject = document.getElementById('lesson-subject').value || "Physics";
+            const level = document.getElementById('lesson-level').value;
+            const duration = document.getElementById('lesson-duration').value || "60 minutes";
+            const objectivesRaw = document.getElementById('lesson-objectives').value || "1. Understand core physical mechanics.\n2. Master standard equations.";
+            const concepts = document.getElementById('lesson-concepts').value || "Newtonian forces and kinematic principles";
+
+            // Map learning objectives
+            const objectivesList = objectivesRaw.split('\n')
+                .filter(line => line.trim() !== '')
+                .map(line => `  * ${line.trim()}`)
+                .join('\n');
+
+            // Collect checkboxes state
+            const incPretest = document.getElementById('inc-pretest').checked;
+            const incTerms = document.getElementById('inc-terms').checked;
+            const incContent = document.getElementById('inc-content').checked;
+            const incExamples = document.getElementById('inc-examples').checked;
+            const incQuiz = document.getElementById('inc-quiz').checked;
+            const incSummary = document.getElementById('inc-summary').checked;
+            const incPosttest = document.getElementById('inc-posttest').checked;
+            const incAda = document.getElementById('inc-ada').checked;
+
+            // Construct prompt layout
+            let promptText = `System Prompt: Act as a premium, tenure-track physics curriculum specialist and instructional designer. Your task is to design a high-fidelity, comprehensive, academic-grade Physics Lesson Plan tailored strictly to the criteria below.
+
+=== INSTRUCTIONAL CRITERIA & SCHEDULING ===
+* **Lesson Title**: ${title}
+* **Core Subject Area**: ${subject}
+* **Target Audience/Grade Level**: ${level}
+* **Lesson Duration Limit**: ${duration}
+
+=== CORE LEARNING OBJECTIVES ===
+${objectivesList}
+
+=== ESSENTIAL CORE CONCEPTS ===
+* Deep-Dive Focus Areas: ${concepts}
+${customSandboxNotes ? `\n=== EXPERIMENTAL SIMULATOR PARAMETERS ===${customSandboxNotes}\n` : ''}
+=== REQUIRED PEDAGOGICAL MODULAR FLOW ===
+You MUST include and structure detailed markdown content for every selected section checked below:
+`;
+
+            if (incPretest) {
+                promptText += `\n[1. PRE-TEST ASSESSMENT SECTION]
+- Draft 3 conceptual diagnostic multiple-choice questions matching popular cognitive physics misconceptions (e.g., mass-independence during acceleration). Include answer key & reasoning notes.`;
+            }
+
+            if (incTerms) {
+                promptText += `\n[2. KEY VOCABULARY & TERMS TABLE]
+- Build a structured markdown table containing terms, mathematical symbols (using standard LaTeX e.g., $v_x$, $\\theta$), SI metric units, and deep conceptual definitions.`;
+            }
+
+            if (incContent) {
+                promptText += `\n[3. COMPREHENSIVE SUBJECT MATTER CONTENT]
+- Draft complete instructional content. Do not write summaries or placeholders. Use rigorous math derivations. Show exactly how basic equations (like classical position arrays) are extracted. Include LaTeX style formulas (e.g., $d = v_0 t + \\frac{1}{2} a t^2$) inside inline or block indicators ($ and $$).`;
+            }
+
+            if (incExamples) {
+                promptText += `\n[4. STEP-BY-STEP WORKED REAL-WORLD EXAMPLES]
+- Provide 2 distinct, highly illustrative real-world problems. Walk through the math step-by-step. Break down horizontal vector calculations, variables mapping, formula assignment, mathematical substitution, and physical unit tracking.`;
+            }
+
+            if (incQuiz) {
+                promptText += `\n[5. FORMATIVE CLASSROOM QUIZZES]
+- Provide 5 distinct quiz questions. Include 2 simple theoretical conceptual challenges and 3 quantitative problems with progressive computational complexity. Provide comprehensive step-by-step mathematical answers for the instructor's key.`;
+            }
+
+            if (incSummary) {
+                promptText += `\n[6. MATHEMATHICAL CHEATSHEET & SUMMARY]
+- Provide a summary containing the mathematical formulas used in the lesson, noting the physical limits of each (e.g., "Applicable only in vacuum configurations").`;
+            }
+
+            if (incPosttest) {
+                promptText += `\n[7. POST-TEST EVALUATION]
+- Generate 5 rigorous summative assessment problems. Provide questions designed to test deep conceptual understanding and mathematical skill limits.`;
+            }
+
+            if (incAda) {
+                promptText += `\n[8. COMPLETE ADA ACCESSIBILITY CHECKLIST]
+- Include a structural ADA checklist for the educator:
+  * Alternative text guides for all diagrams or charts.
+  * Directives to translate visual math vectors into audio screen-reader representations.
+  * Modifications for neurodivergent or cognitively impaired students.`;
+            }
+
+            promptText += `\n\n=== GENERAL STYLE AND FORMATTING REQUIREMENTS ===
+1. Use only LaTeX-style syntax for formatting all mathematical and scientific notation (including formulas, Greek letters, physical symbols, etc.). Enclose inline formulas in $ (e.g., $F = ma$) and display block formulas in $$.
+2. NEVER use raw unicode characters for mathematical notation or Greek letters.
+3. Keep explanations highly engaging, professional, and accessible. Use clean, tiered markdown headings to split the modules cleanly.
+
+Please write the complete, finalized physics lesson. Do not summarize or stop in the middle of derivations!`;
+
+            document.getElementById('prompt-output').value = promptText;
+        }
+
+        // COPY TO CLIPBOARD
+        function copyToClipboard() {
+            const textarea = document.getElementById('prompt-output');
+            
+            // Modern Clipboard API attempt
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(textarea.value).then(() => {
+                    showToast();
+                }).catch(() => {
+                    fallbackCopyText(textarea);
+                });
+            } else {
+                fallbackCopyText(textarea);
+            }
+        }
+
+        function fallbackCopyText(textarea) {
+            textarea.select();
+            textarea.setSelectionRange(0, 99999); // Mobile
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showToast();
+                } else {
+                    alert('Copy command was unsuccessful, please select and copy manually.');
+                }
+            } catch (err) {
+                alert('Fallback copy failed. Please highlight and copy manually.');
+            }
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast-notif');
+            toast.textContent = "✓ Prompt Copied!";
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 2500);
+        }
+
+        // ==========================================
+        // CANVAS-BASED PHYSICS SIMULATION ENGINE
+        // ==========================================
+        const canvas = document.getElementById('sim-canvas');
+        const ctx = canvas.getContext('2d');
+        let projectiles = [];
+        let animationFrameId;
+
+        // Resize Canvas dynamically depending on parent
+        function resizeCanvas() {
+            const rect = canvas.parentNode.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            drawScene();
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('DOMContentLoaded', () => {
+            resizeCanvas();
+            loadPreset('kinematics'); // Load kinematic default on launch
+        });
+
+        function updateSliders() {
+            const v0 = document.getElementById('param-speed').value;
+            const theta = document.getElementById('param-angle').value;
+            const g = document.getElementById('param-gravity').value;
+
+            document.getElementById('val-speed').innerHTML = `$v_0$: ${v0} m/s`;
+            document.getElementById('val-angle').innerHTML = `$\\theta$: ${theta}°`;
+            document.getElementById('val-gravity').innerHTML = `$g$: ${g} m/s²`;
+
+            // Calculate analytical values for readouts
+            const thetaRad = (theta * Math.PI) / 180;
+            const hMax = (v0 * v0 * Math.sin(thetaRad) * Math.sin(thetaRad)) / (2 * g);
+            const rRange = (v0 * v0 * Math.sin(2 * thetaRad)) / g;
+            const tFlight = (2 * v0 * Math.sin(thetaRad)) / g;
+
+            document.getElementById('out-height').textContent = hMax.toFixed(2);
+            document.getElementById('out-range').textContent = rRange.toFixed(2);
+            document.getElementById('out-time').textContent = tFlight.toFixed(2);
+
+            drawScene();
+        }
+
+        function setGravityPreset(val) {
+            document.getElementById('param-gravity').value = val;
+            updateSliders();
+        }
+
+        function drawScene() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Ground level
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height - 30);
+            ctx.lineTo(canvas.width, canvas.height - 30);
+            ctx.stroke();
+
+            // Draw Canon / Launcher Base
+            ctx.save();
+            ctx.translate(30, canvas.height - 30);
+            
+            const angleVal = document.getElementById('param-angle').value;
+            const rad = -(angleVal * Math.PI) / 180;
+            ctx.rotate(rad);
+
+            // Barrel
+            ctx.fillStyle = '#0284c7';
+            ctx.fillRect(0, -6, 25, 12);
+            ctx.fillStyle = '#075985';
+            ctx.fillRect(20, -7, 6, 14);
+
+            ctx.restore();
+
+            // Draw Canon joint wheel
+            ctx.beginPath();
+            ctx.arc(30, canvas.height - 30, 8, 0, 2 * Math.PI);
+            ctx.fillStyle = '#475569';
+            ctx.fill();
+
+            // Draw trajectories
+            projectiles.forEach(p => {
+                // Draw path trace
+                ctx.beginPath();
+                ctx.strokeStyle = p.color;
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([3, 3]);
+                for (let i = 0; i < p.history.length; i++) {
+                    const pt = p.history[i];
+                    if (i === 0) ctx.moveTo(pt.x, pt.y);
+                    else ctx.lineTo(pt.x, pt.y);
+                }
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Draw active projectile
+                if (p.active) {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 5, 0, 2 * Math.PI);
+                    ctx.fillStyle = '#f59e0b';
+                    ctx.fill();
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+            });
+        }
+
+        function fireProjectile() {
+            const v0 = parseFloat(document.getElementById('param-speed').value);
+            const theta = parseFloat(document.getElementById('param-angle').value);
+            const g = parseFloat(document.getElementById('param-gravity').value);
+
+            const thetaRad = (theta * Math.PI) / 180;
+            
+            // Physics attributes (Scale: 10 pixels = 1 meter)
+            const scale = 10;
+            const p = {
+                x: 30,
+                y: canvas.height - 30,
+                vx: v0 * Math.cos(thetaRad) * scale,
+                vy: -v0 * Math.sin(thetaRad) * scale,
+                g: g * scale,
+                history: [],
+                active: true,
+                color: getRandomPhysicsColor(),
+                timeElapsed: 0
+            };
+
+            projectiles.push(p);
+
+            // Limit array sizes
+            if (projectiles.length > 5) {
+                projectiles.shift();
+            }
+
+            if (!animationFrameId) {
+                animationFrameId = requestAnimationFrame(updateSimulation);
+            }
+        }
+
+        function getRandomPhysicsColor() {
+            const colors = ['#0ea5e9', '#3b82f6', '#10b981', '#ec4899', '#a855f7'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        function clearSimulation() {
+            projectiles = [];
+            drawScene();
+        }
+
+        function updateSimulation(timestamp) {
+            let activeFound = false;
+            const dt = 0.016; // Assumed fixed delta frame
+
+            projectiles.forEach(p => {
+                if (p.active) {
+                    activeFound = true;
+                    // Push to history trail
+                    p.history.push({ x: p.x, y: p.y });
+
+                    // Update positions with Verlet/Euler integration
+                    p.x += p.vx * dt;
+                    p.y += p.vy * dt;
+
+                    // Update velocity with gravitation constant
+                    p.vy += p.g * dt;
+
+                    // Ground collision
+                    if (p.y >= canvas.height - 30) {
+                        p.y = canvas.height - 30;
+                        p.active = false;
+                    }
+                }
+            });
+
+            drawScene();
+
+            if (activeFound) {
+                animationFrameId = requestAnimationFrame(updateSimulation);
+            } else {
+                animationFrameId = null;
+            }
+        }
+    </script>
+
+</body>
+</html>
