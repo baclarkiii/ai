@@ -215,7 +215,7 @@
             </div>
 
             <!-- Tab Contents -->
-            <div class="pt-4">
+        <div class="pt-4">
                 <!-- VPAA Admin Content -->
                 <div id="vpaa-content" class="tab-content block space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -288,32 +288,65 @@
             </div>
         </section>
 
-        <!-- Highlighted Resource / Special Request Link Section -->
-        <section id="resources" class="relative bg-gradient-to-r from-amber-500 to-amber-600 rounded-2xl shadow-xl overflow-hidden text-slate-900">
-            <div class="absolute inset-0 opacity-10">
-                <!-- Abstract mathematical/sine wave background -->
-                <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
-                    <path fill="white" d="M0,192L48,197.3C96,203,192,213,288,208C384,203,480,181,576,181.3C672,181,768,203,864,224C960,245,1056,267,1152,256C1248,245,1344,203,1392,181.3L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
-                </svg>
+        <!-- Interactive Section: Highlighted Tools & Generators -->
+        <section id="resources" class="space-y-8">
+            <div class="text-center max-w-2xl mx-auto space-y-2">
+                <h2 class="text-3xl font-bold text-slate-900">Interactive Academic Resources</h2>
+                <p class="text-slate-500">Explore educational tools designed by Dr. Clark to enhance teaching paradigms and physics modeling.</p>
             </div>
-            
-            <div class="relative z-10 px-8 py-12 sm:px-12 sm:py-16 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-                <div class="lg:col-span-8 space-y-4">
-                    <div class="inline-block bg-white/20 px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase">
-                        Interactive Physics Modules
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Gauss's Law Module Card -->
+                <div class="relative bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl shadow-xl overflow-hidden text-slate-900 p-8 sm:p-10 flex flex-col justify-between min-h-[320px] transform hover:scale-[1.01] transition-all">
+                    <div class="absolute inset-0 opacity-10 pointer-events-none">
+                        <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+                            <circle cx="50" cy="50" r="40" stroke="white" stroke-width="2" fill="none"/>
+                            <circle cx="50" cy="50" r="20" stroke="white" stroke-dasharray="5 5" stroke-width="1" fill="none"/>
+                        </svg>
                     </div>
-                    <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">
-                        Interactive Lecture: Gauss's Law Visualization
-                    </h2>
-                    <p class="text-slate-900/80 max-w-2xl text-base sm:text-lg">
-                        Step away from standard textbooks. Explore this interactive module developed by Dr. Clark, designed to help physics scholars visually grasp flux density, enclosed charges, and spherical versus cylindrical Gaussian surfaces.
-                    </p>
+                    <div class="relative z-10 space-y-4">
+                        <span class="inline-block bg-white/20 px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase">
+                            Physics Visualization
+                        </span>
+                        <h3 class="text-2xl sm:text-3xl font-extrabold tracking-tight font-serif">
+                            Gauss's Law Simulation
+                        </h3>
+                        <p class="text-slate-900/80 text-sm sm:text-base leading-relaxed">
+                            Step away from standard textbooks. Explore this interactive module developed to help scholars visually grasp flux density, enclosed charges, and custom Gaussian surfaces.
+                        </p>
+                    </div>
+                    <div class="relative z-10 pt-6">
+                        <a href="gausslaw.html" class="inline-flex items-center space-x-2 px-6 py-3 bg-slate-950 text-white hover:bg-slate-900 hover:scale-105 transform active:scale-95 font-bold rounded-lg shadow-lg transition-all text-sm">
+                            <span>Launch Simulation</span>
+                            <i data-lucide="external-link" class="w-4 h-4"></i>
+                        </a>
+                    </div>
                 </div>
-                <div class="lg:col-span-4 flex justify-start lg:justify-end">
-                    <a href="gausslaw.html" class="inline-flex items-center space-x-3 px-8 py-4 bg-slate-950 text-white hover:bg-slate-900 hover:scale-105 transform active:scale-95 font-bold rounded-lg shadow-2xl transition-all">
-                        <span>Launch Simulation</span>
-                        <i data-lucide="external-link" class="w-5 h-5"></i>
-                    </a>
+
+                <!-- Academic Lesson Generator Card -->
+                <div class="relative bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-950 rounded-2xl shadow-xl overflow-hidden text-white p-8 sm:p-10 flex flex-col justify-between min-h-[320px] border border-slate-800 transform hover:scale-[1.01] transition-all">
+                    <div class="absolute inset-0 opacity-10 pointer-events-none">
+                        <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+                            <path d="M10 20 L90 20 M10 40 L90 40 M10 60 L90 60" stroke="white" stroke-width="1.5" fill="none"/>
+                        </svg>
+                    </div>
+                    <div class="relative z-10 space-y-4">
+                        <span class="inline-block bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase">
+                            Administrative Workspace
+                        </span>
+                        <h3 class="text-2xl sm:text-3xl font-extrabold tracking-tight font-serif">
+                            Academic Lesson Generator
+                        </h3>
+                        <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                            Formulate high-quality academic curricula, generate adaptive syllabus structures, and structure pedagogical plans matching academic board expectations.
+                        </p>
+                    </div>
+                    <div class="relative z-10 pt-6">
+                        <a href="lessongen.html" class="inline-flex items-center space-x-2 px-6 py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 hover:scale-105 transform active:scale-95 font-bold rounded-lg shadow-lg transition-all text-sm">
+                            <span>Open Generator</span>
+                            <i data-lucide="sparkles" class="w-4 h-4"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
         </section>
@@ -477,6 +510,7 @@
                     <li><a href="#roles" class="hover:text-amber-400 transition-colors">Administrative Profile</a></li>
                     <li><a href="#publications" class="hover:text-amber-400 transition-colors">Physics Research</a></li>
                     <li><a href="gausslaw.html" class="text-amber-400 hover:underline">Gauss's Law Module</a></li>
+                    <li><a href="lessongen.html" class="text-amber-400 hover:underline">Lesson Plan Generator</a></li>
                 </ul>
             </div>
 
