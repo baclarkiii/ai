@@ -295,7 +295,7 @@
                 <p class="text-slate-500">Explore educational tools designed by Dr. Clark to enhance teaching paradigms and physics modeling.</p>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- Gauss's Law Module Card -->
                 <div class="relative bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl shadow-xl overflow-hidden text-slate-900 p-8 sm:p-10 flex flex-col justify-between min-h-[320px] transform hover:scale-[1.01] transition-all">
                     <div class="absolute inset-0 opacity-10 pointer-events-none">
@@ -345,6 +345,34 @@
                         <a href="lessongen.html" class="inline-flex items-center space-x-2 px-6 py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 hover:scale-105 transform active:scale-95 font-bold rounded-lg shadow-lg transition-all text-sm">
                             <span>Open Generator</span>
                             <i data-lucide="sparkles" class="w-4 h-4"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Academic Test Generator Card -->
+                <div class="relative bg-gradient-to-br from-violet-950 via-purple-900 to-slate-950 rounded-2xl shadow-xl overflow-hidden text-white p-8 sm:p-10 flex flex-col justify-between min-h-[320px] border border-purple-900/50 transform hover:scale-[1.01] transition-all">
+                    <div class="absolute inset-0 opacity-10 pointer-events-none">
+                        <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+                            <rect x="15" y="15" width="70" height="70" rx="5" stroke="white" stroke-width="1.5" fill="none"/>
+                            <path d="M30 35 L70 35 M30 50 L70 50 M30 65 L55 65" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+                            <circle cx="65" cy="65" r="5" stroke="white" stroke-width="1.5" fill="none"/>
+                        </svg>
+                    </div>
+                    <div class="relative z-10 space-y-4">
+                        <span class="inline-block bg-purple-500/20 border border-purple-500/30 text-purple-300 px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase">
+                            Assessment Design
+                        </span>
+                        <h3 class="text-2xl sm:text-3xl font-extrabold tracking-tight font-serif">
+                            Academic Test Generator
+                        </h3>
+                        <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                            Develop customized exams, structured question banks, and detailed grading rubrics aligned with collegiate benchmarks and diagnostic standards.
+                        </p>
+                    </div>
+                    <div class="relative z-10 pt-6">
+                        <a href="testgen.html" class="inline-flex items-center space-x-2 px-6 py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 hover:scale-105 transform active:scale-95 font-bold rounded-lg shadow-lg transition-all text-sm">
+                            <span>Design Exams</span>
+                            <i data-lucide="clipboard-check" class="w-4 h-4"></i>
                         </a>
                     </div>
                 </div>
@@ -511,6 +539,7 @@
                     <li><a href="#publications" class="hover:text-amber-400 transition-colors">Physics Research</a></li>
                     <li><a href="gausslaw.html" class="text-amber-400 hover:underline">Gauss's Law Module</a></li>
                     <li><a href="lessongen.html" class="text-amber-400 hover:underline">Lesson Plan Generator</a></li>
+                    <li><a href="testgen.html" class="text-amber-400 hover:underline">Test Generator</a></li>
                 </ul>
             </div>
 
